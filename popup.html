@@ -1,8 +1,30 @@
-
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- ...existing code... -->
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 10px;
+        padding: 0;
+        background: #f0f0f0;
+      }
+      button, li button {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        padding: 6px 10px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      #savedSites li {
+        display: flex;
+        justify-content: space-between;
+        margin: 5px 0;
+        background: #fff;
+        padding: 5px;
+        border-radius: 4px;
+      }
+    </style>
   </head>
   <body>
     <button id="saveSiteBtn">Save Current Site</button>
