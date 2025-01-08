@@ -36,4 +36,13 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   });
+
+  const manageBtn = document.getElementById("manageSitesBtn");
+  const managePanel = document.getElementById("managePanel");
+
+  manageBtn.addEventListener("click", () => {
+    managePanel.style.display = managePanel.style.display === "none"
+      ? "block"
+      : "none";
+  });
 });
