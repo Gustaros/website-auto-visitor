@@ -117,6 +117,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  // --- UI для расписания ---
+  const scheduleDiv = document.createElement('div');
+  scheduleDiv.style.margin = '10px 0';
+  scheduleDiv.innerHTML = '<b>Автозапуск по расписанию:</b><br><input id="schedule-time" type="time"> <button id="set-schedule">Установить</button>';
+  document.body.appendChild(scheduleDiv);
+
+  const scheduleInput = document.getElementById('schedule-time');
+  const setScheduleBtn = document.getElementById('set-schedule');
+
+  setScheduleBtn.onclick = () => {
+    if (!currentDomain || !scheduleInput.value) return;
+    chrome.runtime.sendMessage({ type: 'SCHEDULE_SCENARIO', domain: currentDomain, time: scheduleInput.value }, resp => {
+      statusDiv.textContent = 'Автозапуск для ' + currentDomain + ' установлен на ' + scheduleInput.value;
+    });
+  };
+
+  // Показываем текущее расписание
+  chrome.runtime.sendMessage({ type: 'GET_SCHEDULED_TASKS' }, resp => {
+    const scheduled = resp.scheduledTasks || {};
+    if (scheduled[currentDomain]) {
+      scheduleInput.value = scheduled[currentDomain];
+      statusDiv.textContent += '\nАвтозапуск: ' + scheduled[currentDomain];
+    }
+  });
+
   function updateScenarioList() {
     if (!scenarioList) return;
     scenarioList.innerHTML = '';

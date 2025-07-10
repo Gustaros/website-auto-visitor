@@ -45,9 +45,29 @@ function handleInput(e) {
   });
 }
 
+// Добавляем обработку прокрутки (scroll)
+let lastScrollTop = window.scrollY;
+window.addEventListener('scroll', function() {
+  if (!isRecording) return;
+  const scrollTop = window.scrollY;
+  if (Math.abs(scrollTop - lastScrollTop) > 10) { // фиксируем только значимые прокрутки
+    recordedActions.push({
+      type: 'scroll',
+      scrollTop,
+      timestamp: Date.now()
+    });
+    lastScrollTop = scrollTop;
+  }
+}, true);
+
 // Воспроизведение действий
 async function playActions(actions) {
   for (const action of actions) {
+    if (action.type === 'scroll') {
+      window.scrollTo({ top: action.scrollTop, behavior: 'smooth' });
+      await new Promise(r => setTimeout(r, 700));
+      continue;
+    }
     const el = document.querySelector(action.selector);
     if (!el) continue;
     if (action.type === 'click') {
