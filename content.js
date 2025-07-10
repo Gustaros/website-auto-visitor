@@ -27,11 +27,21 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 function handleClick(e) {
   if (!isRecording) return;
   const selector = getUniqueSelector(e.target);
-  recordedActions.push({
-    type: 'click',
-    selector,
-    timestamp: Date.now()
-  });
+  // Если клик по ссылке (a[href]) — записываем как переход
+  if (e.target.tagName === 'A' && e.target.href) {
+    recordedActions.push({
+      type: 'link',
+      selector,
+      href: e.target.href,
+      timestamp: Date.now()
+    });
+  } else {
+    recordedActions.push({
+      type: 'click',
+      selector,
+      timestamp: Date.now()
+    });
+  }
 }
 
 function handleInput(e) {
@@ -68,6 +78,10 @@ async function playActions(actions) {
       await new Promise(r => setTimeout(r, 700));
       continue;
     }
+    if (action.type === 'link') {
+      window.location.href = action.href;
+      return; // дальнейшие действия будут невозможны после перехода
+    }
     const el = document.querySelector(action.selector);
     if (!el) continue;
     if (action.type === 'click') {
@@ -87,6 +101,8 @@ function getUniqueSelector(el) {
   while (el && el.nodeType === 1 && path.length < 5) {
     let selector = el.nodeName.toLowerCase();
     if (el.className) selector += '.' + Array.from(el.classList).join('.');
+    // Для ссылок добавляем [href] для надёжности
+    if (el.tagName === 'A' && el.getAttribute('href')) selector += `[href='${el.getAttribute('href')}']`;
     path.unshift(selector);
     el = el.parentElement;
   }

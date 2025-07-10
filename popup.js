@@ -150,12 +150,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const li = document.createElement('li');
       li.textContent = domain + (domain === currentDomain ? ' (текущий)' : '');
       li.style.cursor = 'pointer';
+      // Кнопка удаления сценария
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '✕';
+      delBtn.title = 'Удалить сценарий';
+      delBtn.style.marginLeft = '8px';
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (confirm('Удалить сценарий для ' + domain + '?')) {
+          delete scenarios[domain];
+          chrome.storage.local.set({ scenarios }, () => updateScenarioList());
+        }
+      };
       li.onclick = () => {
         recordedActions = scenarios[domain] || [];
         playBtn.disabled = !recordedActions.length;
         statusDiv.textContent = 'Выбран сценарий для: ' + domain + '. Действий: ' + recordedActions.length;
         console.log('[Website Auto Visitor] Выбран сценарий:', domain, recordedActions);
       };
+      li.appendChild(delBtn);
       scenarioList.appendChild(li);
     });
   }
