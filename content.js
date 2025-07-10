@@ -71,3 +71,15 @@ function getUniqueSelector(el) {
   }
   return path.join(' > ');
 }
+
+// Обработка горячей клавиши для остановки записи (Ctrl+Shift+S)
+document.addEventListener('keydown', function(e) {
+  if (isRecording && e.ctrlKey && e.shiftKey && e.code === 'KeyS') {
+    isRecording = false;
+    window.removeEventListener('click', handleClick, true);
+    window.removeEventListener('input', handleInput, true);
+    // Отправляем сообщение в background для сохранения
+    chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions});
+    alert('Запись остановлена (Ctrl+Shift+S).');
+  }
+});
