@@ -107,14 +107,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  // --- Поиск по имени сценария ---
+  const searchDiv = document.createElement('div');
+  searchDiv.style.margin = '10px 0';
+  searchDiv.innerHTML = '<input id="scenario-search" type="text" placeholder="Поиск сценария по имени..." style="width:95%">';
+  document.body.insertBefore(searchDiv, scenarioList);
+  const searchInput = document.getElementById('scenario-search');
+  let scenarioFilter = '';
+  searchInput.oninput = () => {
+    scenarioFilter = searchInput.value.trim().toLowerCase();
+    updateScenarioList();
+  };
+
   function updateScenarioList() {
     if (!scenarioList) return;
     scenarioList.innerHTML = '';
     Object.keys(scenarios).forEach(domain => {
       if (!domain || domain === 'undefined') return;
       const scenario = scenarios[domain];
+      const name = (scenario.name || domain);
+      if (scenarioFilter && !name.toLowerCase().includes(scenarioFilter)) return;
       const li = document.createElement('li');
-      li.textContent = (scenario.name || domain) + (domain === currentDomain ? ' (текущий)' : '');
+      li.textContent = name + (domain === currentDomain ? ' (текущий)' : '');
       li.style.cursor = 'pointer';
       li.style.padding = '2px 4px';
       li.style.borderRadius = '4px';
