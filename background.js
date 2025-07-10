@@ -5,13 +5,13 @@ chrome.runtime.onInstalled.addListener(() => {
   // ...можно добавить инициализацию при установке...
 });
 
-// Сохраняем сценарии по домену
+// Сохраняем сценарии по домену с поддержкой имени
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'SAVE_ACTIONS') {
-    const { actions, domain } = msg;
+    const { actions, domain, name } = msg;
     chrome.storage.local.get('scenarios', data => {
       const scenarios = data.scenarios || {};
-      scenarios[domain] = actions;
+      scenarios[domain] = { name: name || domain, domain, actions };
       chrome.storage.local.set({ scenarios }, () => {
         sendResponse({ status: 'saved' });
       });
@@ -20,6 +20,20 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   } else if (msg.type === 'GET_SCENARIOS') {
     chrome.storage.local.get('scenarios', data => {
       sendResponse({ scenarios: data.scenarios || {} });
+    });
+    return true;
+  } else if (msg.type === 'RENAME_SCENARIO') {
+    const { domain, name } = msg;
+    chrome.storage.local.get('scenarios', data => {
+      const scenarios = data.scenarios || {};
+      if (scenarios[domain]) {
+        scenarios[domain].name = name;
+        chrome.storage.local.set({ scenarios }, () => {
+          sendResponse({ status: 'renamed' });
+        });
+      } else {
+        sendResponse({ status: 'not_found' });
+      }
     });
     return true;
   } else if (msg.type === 'SCHEDULE_SCENARIO') {

@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentDomain = '';
   let scenarios = {};
   let selectedDomain = '';
+  let selectedName = '';
 
   // Получаем домен текущей вкладки
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
@@ -93,7 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
         playBtn.disabled = recordedActions.length === 0;
         // Сохраняем сценарий по домену, только если домен определён
         if (currentDomain) {
-          chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: currentDomain}, () => {
+          const name = prompt('Введите имя для сценария:', currentDomain) || currentDomain;
+          chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: currentDomain, name}, () => {
             // Обновляем список сценариев
             chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
               scenarios = resp.scenarios || {};
@@ -110,8 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
     scenarioList.innerHTML = '';
     Object.keys(scenarios).forEach(domain => {
       if (!domain || domain === 'undefined') return;
+      const scenario = scenarios[domain];
       const li = document.createElement('li');
-      li.textContent = domain + (domain === currentDomain ? ' (текущий)' : '');
+      li.textContent = (scenario.name || domain) + (domain === currentDomain ? ' (текущий)' : '');
       li.style.cursor = 'pointer';
       li.style.padding = '2px 4px';
       li.style.borderRadius = '4px';
@@ -126,24 +129,43 @@ document.addEventListener('DOMContentLoaded', () => {
       delBtn.style.marginLeft = '8px';
       delBtn.onclick = (e) => {
         e.stopPropagation();
-        if (confirm('Удалить сценарий для ' + domain + '?')) {
+        if (confirm('Удалить сценарий для ' + (scenario.name || domain) + '?')) {
           delete scenarios[domain];
           chrome.storage.local.set({ scenarios }, () => updateScenarioList());
           if (selectedDomain === domain) {
             selectedDomain = '';
+            selectedName = '';
             recordedActions = [];
             playBtn.disabled = true;
           }
         }
       };
+      // Кнопка переименования
+      const renameBtn = document.createElement('button');
+      renameBtn.textContent = '✎';
+      renameBtn.title = 'Переименовать сценарий';
+      renameBtn.style.marginLeft = '4px';
+      renameBtn.onclick = (e) => {
+        e.stopPropagation();
+        const newName = prompt('Новое имя сценария:', scenario.name || domain);
+        if (newName && newName !== scenario.name) {
+          chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain, name: newName }, () => {
+            scenarios[domain].name = newName;
+            updateScenarioList();
+            if (selectedDomain === domain) selectedName = newName;
+          });
+        }
+      };
       li.onclick = () => {
         selectedDomain = domain;
-        recordedActions = scenarios[domain] || [];
+        selectedName = scenario.name || domain;
+        recordedActions = scenario.actions || [];
         playBtn.disabled = !recordedActions.length;
         updateScenarioList();
-        statusDiv.textContent = 'Выбран сценарий для: ' + domain + '. Действий: ' + recordedActions.length;
-        console.log('[Website Auto Visitor] Выбран сценарий:', domain, recordedActions);
+        statusDiv.textContent = 'Выбран сценарий: ' + selectedName + ' (' + domain + '). Действий: ' + recordedActions.length;
+        console.log('[Website Auto Visitor] Выбран сценарий:', selectedName, recordedActions);
       };
+      li.appendChild(renameBtn);
       li.appendChild(delBtn);
       scenarioList.appendChild(li);
     });
@@ -155,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
       statusDiv.textContent = 'Сначала выберите сценарий.';
       return;
     }
-    if (!confirm('Воспроизвести сценарий для ' + selectedDomain + '?')) return;
+    if (!confirm('Воспроизвести сценарий: ' + (selectedName || selectedDomain) + '?')) return;
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: recordedActions}, (resp, err) => {
         if (err) {
