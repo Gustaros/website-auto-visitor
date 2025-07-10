@@ -310,6 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const ul = document.createElement('ul');
     ul.style.paddingLeft = '20px';
+    let dragSrcIdx = null;
     actions.forEach((action, idx) => {
       const li = document.createElement('li');
       li.textContent = `${idx + 1}. ${action.type}` + (action.selector ? ` [${action.selector}]` : '') + (action.value ? ` = "${action.value}"` : '') + (action.href ? ` → ${action.href}` : '') + (action.scrollTop !== undefined ? ` (scroll: ${action.scrollTop})` : '');
@@ -327,6 +328,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       };
       li.appendChild(delBtn);
+      // Drag&Drop
+      li.draggable = true;
+      li.ondragstart = (e) => {
+        dragSrcIdx = idx;
+        li.style.opacity = '0.5';
+      };
+      li.ondragend = (e) => {
+        li.style.opacity = '';
+      };
+      li.ondragover = (e) => {
+        e.preventDefault();
+        li.style.background = '#ffeeba';
+      };
+      li.ondragleave = (e) => {
+        li.style.background = '';
+      };
+      li.ondrop = (e) => {
+        e.preventDefault();
+        li.style.background = '';
+        if (dragSrcIdx !== null && dragSrcIdx !== idx) {
+          const moved = scenario.actions.splice(dragSrcIdx, 1)[0];
+          scenario.actions.splice(idx, 0, moved);
+          chrome.runtime.sendMessage({ type: 'SAVE_ACTIONS', actions: scenario.actions, domain: selectedDomain, name: scenario.name }, () => {
+            scenarios[selectedDomain].actions = scenario.actions;
+            renderActionsList();
+            updateScenarioList();
+          });
+        }
+        dragSrcIdx = null;
+      };
       ul.appendChild(li);
     });
     actionsDiv.appendChild(ul);
