@@ -102,7 +102,8 @@ function getTodayString() {
 }
 
 chrome.runtime.onStartup.addListener(() => {
-  chrome.storage.local.get(['scenarios', 'lastAutoRunDate'], data => {
+  chrome.storage.local.get(['scenarios', 'lastAutoRunDate', 'autoRunAllEnabled'], data => {
+    if (!data.autoRunAllEnabled) return;
     const today = getTodayString();
     if (data.lastAutoRunDate === today) return; // Уже запускали сегодня
     const scenarios = data.scenarios || {};

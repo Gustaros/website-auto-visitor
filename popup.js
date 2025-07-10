@@ -526,4 +526,29 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     document.body.appendChild(importBtn);
   }
+
+  // --- Переключатель автозапуска всех сценариев при запуске браузера ---
+  let autoRunSwitchDiv = document.getElementById('autoRunSwitchDiv');
+  if (!autoRunSwitchDiv) {
+    autoRunSwitchDiv = document.createElement('div');
+    autoRunSwitchDiv.id = 'autoRunSwitchDiv';
+    autoRunSwitchDiv.style.margin = '10px 0 0 0';
+    autoRunSwitchDiv.style.display = 'flex';
+    autoRunSwitchDiv.style.alignItems = 'center';
+    autoRunSwitchDiv.innerHTML = `
+      <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+        <input type="checkbox" id="autoRunAllSwitch" style="width:18px;height:18px;"> 
+        Автоматически запускать все сценарии при запуске браузера
+      </label>
+    `;
+    document.body.insertBefore(autoRunSwitchDiv, document.body.firstChild.nextSibling);
+  }
+  let autoRunAllSwitch = document.getElementById('autoRunAllSwitch');
+  // Инициализация состояния переключателя
+  chrome.storage.local.get('autoRunAllEnabled', data => {
+    autoRunAllSwitch.checked = !!data.autoRunAllEnabled;
+  });
+  autoRunAllSwitch.onchange = () => {
+    chrome.storage.local.set({ autoRunAllEnabled: autoRunAllSwitch.checked });
+  };
 });
