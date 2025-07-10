@@ -1,0 +1,56 @@
+{
+  "appName": {
+    "message": "Website Auto Visitor"
+  },
+  "startRecording": {
+    "message": "Начать запись"
+  },
+  "stopRecording": {
+    "message": "Остановить запись"
+  },
+  "playActions": {
+    "message": "Воспроизвести"
+  },
+  "statusRecording": {
+    "message": "Запись..."
+  },
+  "statusStopped": {
+    "message": "Запись остановлена. Действий: {count}"
+  },
+  "statusPlaying": {
+    "message": "Воспроизведение..."
+  },
+  "domain": {
+    "message": "Домен: {domain}"
+  },
+  "selectScenario": {
+    "message": "Сначала выберите сценарий."
+  },
+  "deleteScenario": {
+    "message": "Удалить сценарий для {name}?"
+  },
+  "renameScenario": {
+    "message": "Переименовать сценарий"
+  },
+  "newScenarioName": {
+    "message": "Введите имя для сценария:"
+  },
+  "importScenarios": {
+    "message": "Импорт сценариев"
+  },
+  "exportScenarios": {
+    "message": "Экспорт сценариев"
+  },
+  "autoRunAll": {
+    "message": "Автоматически запускать все сценарии при запуске браузера"
+  },
+  "searchScenario": {
+    "message": "Поиск сценария по имени..."
+  },
+  "noActions": {
+    "message": "Нет действий в сценарии."
+  },
+  "deleteAction": {
+    "message": "Удалить действие"
+  }
+}

@@ -554,4 +554,21 @@ document.addEventListener('DOMContentLoaded', () => {
   autoRunAllSwitch.onchange = () => {
     chrome.storage.local.set({ autoRunAllEnabled: autoRunAllSwitch.checked });
   };
+
+  // Функция для получения локализованного сообщения
+  function t(key, substitutions = {}) {
+    if (typeof chrome !== 'undefined' && chrome.i18n && chrome.i18n.getMessage) {
+      let msg = chrome.i18n.getMessage(key);
+      if (!msg) return key;
+      Object.entries(substitutions).forEach(([k, v]) => {
+        msg = msg.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+      });
+      return msg;
+    }
+    return key;
+  }
+
+  // Пример использования t() для кнопок и статусов:
+  startBtn.textContent = t('startRecording');
+  statusDiv.textContent = t('statusRecording');
 });

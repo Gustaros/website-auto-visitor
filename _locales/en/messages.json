@@ -1,0 +1,56 @@
+{
+  "appName": {
+    "message": "Website Auto Visitor"
+  },
+  "startRecording": {
+    "message": "Start recording"
+  },
+  "stopRecording": {
+    "message": "Stop recording"
+  },
+  "playActions": {
+    "message": "Play actions"
+  },
+  "statusRecording": {
+    "message": "Recording..."
+  },
+  "statusStopped": {
+    "message": "Recording stopped. Actions: {count}"
+  },
+  "statusPlaying": {
+    "message": "Playing..."
+  },
+  "domain": {
+    "message": "Domain: {domain}"
+  },
+  "selectScenario": {
+    "message": "Select a scenario first."
+  },
+  "deleteScenario": {
+    "message": "Delete scenario for {name}?"
+  },
+  "renameScenario": {
+    "message": "Rename scenario"
+  },
+  "newScenarioName": {
+    "message": "Enter a name for the scenario:"
+  },
+  "importScenarios": {
+    "message": "Import scenarios"
+  },
+  "exportScenarios": {
+    "message": "Export scenarios"
+  },
+  "autoRunAll": {
+    "message": "Automatically run all scenarios on browser startup"
+  },
+  "searchScenario": {
+    "message": "Search scenario by name..."
+  },
+  "noActions": {
+    "message": "No actions in scenario."
+  },
+  "deleteAction": {
+    "message": "Delete action"
+  }
+}
