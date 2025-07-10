@@ -1,6 +1,25 @@
 // Скрипт для popup.html: управление кнопками и взаимодействие сbackground.js
 
+console.log('[Website Auto Visitor] popup.js loaded');
+function t(key, vars) {
+  try {
+    if (typeof chrome !== 'undefined' && chrome.i18n) {
+      let msg = chrome.i18n.getMessage(key);
+      if (vars && msg) {
+        Object.keys(vars).forEach(k => {
+          msg = msg.replace(new RegExp('{' + k + '}', 'g'), vars[k]);
+        });
+      }
+      return msg || key;
+    }
+  } catch (e) {
+    console.warn('t() error', e);
+  }
+  return key;
+}
+console.log('t(startRecording):', t('startRecording'));
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOMContentLoaded');
   const startBtn = document.getElementById('start-record');
   const stopBtn = document.getElementById('stop-record');
   const playBtn = document.getElementById('play-actions');
@@ -331,15 +350,15 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Локализация кнопок и статусов
-  startBtn.textContent = t('startRecording');
-  stopBtn.textContent = t('stopRecording');
-  playBtn.textContent = t('playActions');
+  if (startBtn) startBtn.textContent = t('startRecording');
+  if (stopBtn) stopBtn.textContent = t('stopRecording');
+  if (playBtn) playBtn.textContent = t('playActions');
   if (exportBtn) exportBtn.textContent = t('exportScenarios');
   if (importBtn) importBtn.textContent = t('importScenarios');
   if (searchInput) searchInput.placeholder = t('searchScenario');
-  if (autoRunAllSwitch) autoRunAllSwitch.parentElement.querySelector('span:last-child').textContent = t('autoRunAll');
+  if (autoRunAllSwitch && autoRunAllSwitch.parentElement) autoRunAllSwitch.parentElement.querySelector('span:last-child').textContent = t('autoRunAll');
   if (setScheduleBtn) setScheduleBtn.textContent = t('setSchedule') || 'Установить';
-  if (scheduleDiv) scheduleDiv.querySelector('b').textContent = t('autoRunSchedule') || 'Автозапуск по расписанию:';
+  if (scheduleDiv && scheduleDiv.querySelector('b')) scheduleDiv.querySelector('b').textContent = t('autoRunSchedule') || 'Автозапуск по расписанию:';
 
   // Локализация тултипов для кнопок
   if (exportBtn) exportBtn.title = t('exportScenarios');
