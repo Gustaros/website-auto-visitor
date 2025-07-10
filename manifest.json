@@ -33,5 +33,6 @@
       "js": ["content.js"]
     }
   ],
-  "options_page": "options.html"
+  "options_page": "options.html",
+  "default_locale": "en"
 }
