@@ -98,7 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
         playBtn.disabled = recordedActions.length === 0;
         if (currentDomain) {
           const name = prompt(t('newScenarioName'), currentDomain) || currentDomain;
-          chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: currentDomain, name}, () => {
+          let desc = '';
+          if (descTextarea) desc = descTextarea.value;
+          chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: currentDomain, name, desc}, () => {
             chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
               scenarios = resp.scenarios || {};
               updateScenarioList();
@@ -175,6 +177,24 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         }
       };
+      // Кнопка/иконка для редактирования описания сценария
+      const descBtn = document.createElement('button');
+      descBtn.textContent = '📝';
+      descBtn.title = t('tooltipDesc');
+      descBtn.onclick = (e) => {
+        e.stopPropagation();
+        showScenarioDesc(scenario.desc);
+        descTextarea.focus();
+        descTextarea.onblur = () => {
+          const newDesc = descTextarea.value;
+          if (newDesc !== scenario.desc) {
+            chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain, name: scenario.name, desc: newDesc }, () => {
+              scenarios[domain].desc = newDesc;
+              updateScenarioList();
+            });
+          }
+        };
+      };
       li.onclick = () => {
         selectedDomain = domain;
         selectedName = scenario.name || domain;
@@ -183,9 +203,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateScenarioList();
         statusDiv.textContent = t('selectScenario') + ': ' + selectedName + ' (' + domain + '). ' + t('statusStopped', { count: recordedActions.length });
         renderActionsList();
+        showScenarioDesc(scenario.desc);
       };
       li.appendChild(renameBtn);
       li.appendChild(delBtn);
+      li.appendChild(descBtn);
       scenarioList.appendChild(li);
     });
     renderActionsList();
@@ -327,6 +349,129 @@ document.addEventListener('DOMContentLoaded', () => {
   if (playBtn) playBtn.title = t('playActions');
   if (setScheduleBtn) setScheduleBtn.title = t('setSchedule') || 'Установить';
   if (autoRunAllSwitch) autoRunAllSwitch.title = t('autoRunAll');
+
+  // Локализация label и placeholder для описания
+  const descDiv = document.getElementById('descDiv');
+  const descLabel = document.getElementById('descLabel');
+  const descTextarea = document.getElementById('scenario-desc');
+  if (descLabel) descLabel.textContent = t('descLabel');
+  if (descTextarea) descTextarea.placeholder = t('descPlaceholder');
+
+  // --- Описание сценария ---
+  function showScenarioDesc(desc) {
+    if (!descDiv || !descTextarea) return;
+    descDiv.style.display = 'block';
+    descTextarea.value = desc || '';
+  }
+  function hideScenarioDesc() {
+    if (!descDiv) return;
+    descDiv.style.display = 'none';
+  }
+
+  // Пошаговый интерактивный onboarding (примерная реализация)
+  function runOnboarding() {
+    const steps = [
+      { el: startBtn, msg: t('onboardingStep1') },
+      { el: stopBtn, msg: t('onboardingStep2') },
+      { el: playBtn, msg: t('onboardingStep3') },
+      { el: scheduleDiv, msg: t('onboardingStep4') },
+      { el: descDiv, msg: t('onboardingStep5') }
+    ];
+    let idx = 0;
+    function showStep(i) {
+      if (i >= steps.length) return;
+      const { el, msg } = steps[i];
+      if (!el) return showStep(i + 1);
+      const rect = el.getBoundingClientRect();
+      const overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.left = rect.left + 'px';
+      overlay.style.top = rect.top + 'px';
+      overlay.style.width = rect.width + 'px';
+      overlay.style.height = rect.height + 'px';
+      overlay.style.background = 'rgba(25,118,210,0.15)';
+      overlay.style.zIndex = 9999;
+      overlay.style.borderRadius = '8px';
+      overlay.style.pointerEvents = 'none';
+      document.body.appendChild(overlay);
+      const tip = document.createElement('div');
+      tip.textContent = msg;
+      tip.style.position = 'fixed';
+      tip.style.left = (rect.left + rect.width + 10) + 'px';
+      tip.style.top = rect.top + 'px';
+      tip.style.background = '#fff';
+      tip.style.border = '1px solid #1976d2';
+      tip.style.borderRadius = '8px';
+      tip.style.padding = '12px 18px';
+      tip.style.boxShadow = '0 2px 8px #0002';
+      tip.style.zIndex = 10000;
+      tip.style.maxWidth = '260px';
+      tip.style.fontSize = '15px';
+      tip.style.color = '#1976d2';
+      tip.style.lineHeight = '1.4';
+      tip.style.pointerEvents = 'auto';
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = t('onboardingOk');
+      nextBtn.style.marginTop = '10px';
+      nextBtn.style.background = '#1976d2';
+      nextBtn.style.color = '#fff';
+      nextBtn.style.border = 'none';
+      nextBtn.style.borderRadius = '5px';
+      nextBtn.style.padding = '6px 18px';
+      nextBtn.onclick = () => {
+        overlay.remove();
+        tip.remove();
+        showStep(i + 1);
+      };
+      tip.appendChild(document.createElement('br'));
+      tip.appendChild(nextBtn);
+      document.body.appendChild(tip);
+    }
+    showStep(0);
+  }
+
+  // Onboarding: показать приветствие при первом запуске
+  chrome.storage.local.get('onboardingShown', data => {
+    if (!data.onboardingShown) {
+      const onboardingDiv = document.createElement('div');
+      onboardingDiv.id = 'onboardingDiv';
+      onboardingDiv.style.position = 'fixed';
+      onboardingDiv.style.top = '0';
+      onboardingDiv.style.left = '0';
+      onboardingDiv.style.width = '100%';
+      onboardingDiv.style.height = '100%';
+      onboardingDiv.style.background = 'rgba(255,255,255,0.97)';
+      onboardingDiv.style.zIndex = '9999';
+      onboardingDiv.style.display = 'flex';
+      onboardingDiv.style.flexDirection = 'column';
+      onboardingDiv.style.justifyContent = 'center';
+      onboardingDiv.style.alignItems = 'center';
+      onboardingDiv.innerHTML = `
+        <div style="max-width:320px;padding:24px 18px 18px 18px;border-radius:10px;box-shadow:0 2px 12px #0001;background:#fff;text-align:center;">
+          <h3 style="color:#1976d2;">👋 ${t('appName')}</h3>
+          <p style="font-size:15px;line-height:1.5;margin:10px 0 18px 0;">${t('onboardingWelcome')}<br><br>
+          <b>${t('startRecording')}</b> — ${t('onboardingRecord')}<br>
+          <b>${t('playActions')}</b> — ${t('onboardingPlay')}<br>
+          <b>${t('autoRunAll')}</b> — ${t('onboardingAuto')}</p>
+          <button id="onboardingCloseBtn" style="margin-top:10px;padding:8px 24px;font-size:15px;background:#1976d2;color:#fff;border:none;border-radius:5px;">${t('onboardingOk')}</button>
+        </div>
+      `;
+      document.body.appendChild(onboardingDiv);
+      document.getElementById('onboardingCloseBtn').onclick = () => {
+        onboardingDiv.remove();
+        chrome.storage.local.set({ onboardingShown: true });
+      };
+    }
+  });
+
+  // Tooltips для всех кнопок
+  if (startBtn) startBtn.title = t('tooltipStart');
+  if (stopBtn) stopBtn.title = t('tooltipStop');
+  if (playBtn) playBtn.title = t('tooltipPlay');
+  if (exportBtn) exportBtn.title = t('tooltipExport');
+  if (importBtn) importBtn.title = t('tooltipImport');
+  if (autoRunAllSwitch) autoRunAllSwitch.title = t('tooltipAutoRun');
+  if (setScheduleBtn) setScheduleBtn.title = t('tooltipSchedule');
 });
 
 // Локализация статусов и сообщений
@@ -389,6 +534,24 @@ function updateScenarioList() {
         });
       }
     };
+    // Кнопка/иконка для редактирования описания сценария
+    const descBtn = document.createElement('button');
+    descBtn.textContent = '📝';
+    descBtn.title = t('tooltipDesc');
+    descBtn.onclick = (e) => {
+      e.stopPropagation();
+      showScenarioDesc(scenario.desc);
+      descTextarea.focus();
+      descTextarea.onblur = () => {
+        const newDesc = descTextarea.value;
+        if (newDesc !== scenario.desc) {
+          chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain, name: scenario.name, desc: newDesc }, () => {
+            scenarios[domain].desc = newDesc;
+            updateScenarioList();
+          });
+        }
+      };
+    };
     li.onclick = () => {
       selectedDomain = domain;
       selectedName = scenario.name || domain;
@@ -397,9 +560,11 @@ function updateScenarioList() {
       updateScenarioList();
       statusDiv.textContent = t('selectScenario') + ': ' + selectedName + ' (' + domain + '). ' + t('statusStopped', { count: recordedActions.length });
       renderActionsList();
+      showScenarioDesc(scenario.desc);
     };
     li.appendChild(renameBtn);
     li.appendChild(delBtn);
+    li.appendChild(descBtn);
     scenarioList.appendChild(li);
   });
   renderActionsList();
@@ -526,40 +691,72 @@ autoRunAllSwitch.onchange = () => {
   chrome.storage.local.set({ autoRunAllEnabled: autoRunAllSwitch.checked });
 };
 
-  // Onboarding: показать приветствие при первом запуске
-  chrome.storage.local.get('onboardingShown', data => {
-    if (!data.onboardingShown) {
-      const onboardingDiv = document.createElement('div');
-      onboardingDiv.id = 'onboardingDiv';
-      onboardingDiv.style.position = 'fixed';
-      onboardingDiv.style.top = '0';
-      onboardingDiv.style.left = '0';
-      onboardingDiv.style.width = '100%';
-      onboardingDiv.style.height = '100%';
-      onboardingDiv.style.background = 'rgba(255,255,255,0.97)';
-      onboardingDiv.style.zIndex = '9999';
-      onboardingDiv.style.display = 'flex';
-      onboardingDiv.style.flexDirection = 'column';
-      onboardingDiv.style.justifyContent = 'center';
-      onboardingDiv.style.alignItems = 'center';
-      onboardingDiv.innerHTML = `
-        <div style="max-width:320px;padding:24px 18px 18px 18px;border-radius:10px;box-shadow:0 2px 12px #0001;background:#fff;text-align:center;">
-          <h3 style="color:#1976d2;">👋 ${t('appName')}</h3>
-          <p style="font-size:15px;line-height:1.5;margin:10px 0 18px 0;">${t('onboardingWelcome')}<br><br>
-          <b>${t('startRecording')}</b> — ${t('onboardingRecord')}<br>
-          <b>${t('playActions')}</b> — ${t('onboardingPlay')}<br>
-          <b>${t('autoRunAll')}</b> — ${t('onboardingAuto')}</p>
-          <button id="onboardingCloseBtn" style="margin-top:10px;padding:8px 24px;font-size:15px;background:#1976d2;color:#fff;border:none;border-radius:5px;">${t('onboardingOk')}</button>
-        </div>
-      `;
-      document.body.appendChild(onboardingDiv);
-      document.getElementById('onboardingCloseBtn').onclick = () => {
-        onboardingDiv.remove();
-        chrome.storage.local.set({ onboardingShown: true });
-      };
-    }
-  });
+// Пошаговый интерактивный onboarding (примерная реализация)
+function runOnboarding() {
+  const steps = [
+    { el: startBtn, msg: t('onboardingStep1') },
+    { el: stopBtn, msg: t('onboardingStep2') },
+    { el: playBtn, msg: t('onboardingStep3') },
+    { el: scheduleDiv, msg: t('onboardingStep4') },
+    { el: descDiv, msg: t('onboardingStep5') }
+  ];
+  let idx = 0;
+  function showStep(i) {
+    if (i >= steps.length) return;
+    const { el, msg } = steps[i];
+    if (!el) return showStep(i + 1);
+    const rect = el.getBoundingClientRect();
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.left = rect.left + 'px';
+    overlay.style.top = rect.top + 'px';
+    overlay.style.width = rect.width + 'px';
+    overlay.style.height = rect.height + 'px';
+    overlay.style.background = 'rgba(25,118,210,0.15)';
+    overlay.style.zIndex = 9999;
+    overlay.style.borderRadius = '8px';
+    overlay.style.pointerEvents = 'none';
+    document.body.appendChild(overlay);
+    const tip = document.createElement('div');
+    tip.textContent = msg;
+    tip.style.position = 'fixed';
+    tip.style.left = (rect.left + rect.width + 10) + 'px';
+    tip.style.top = rect.top + 'px';
+    tip.style.background = '#fff';
+    tip.style.border = '1px solid #1976d2';
+    tip.style.borderRadius = '8px';
+    tip.style.padding = '12px 18px';
+    tip.style.boxShadow = '0 2px 8px #0002';
+    tip.style.zIndex = 10000;
+    tip.style.maxWidth = '260px';
+    tip.style.fontSize = '15px';
+    tip.style.color = '#1976d2';
+    tip.style.lineHeight = '1.4';
+    tip.style.pointerEvents = 'auto';
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = t('onboardingOk');
+    nextBtn.style.marginTop = '10px';
+    nextBtn.style.background = '#1976d2';
+    nextBtn.style.color = '#fff';
+    nextBtn.style.border = 'none';
+    nextBtn.style.borderRadius = '5px';
+    nextBtn.style.padding = '6px 18px';
+    nextBtn.onclick = () => {
+      overlay.remove();
+      tip.remove();
+      showStep(i + 1);
+    };
+    tip.appendChild(document.createElement('br'));
+    tip.appendChild(nextBtn);
+    document.body.appendChild(tip);
+  }
+  showStep(0);
+}
 
-  // Локализация надписи о прокрутке
-  const scrollMsg = document.getElementById('scroll-recorded-msg');
-  if (scrollMsg) scrollMsg.textContent = t('scrollRecorded');
+// Onboarding запускать при первом запуске
+chrome.storage.local.get('onboardingV2Shown', data => {
+  if (!data.onboardingV2Shown) {
+    runOnboarding();
+    chrome.storage.local.set({ onboardingV2Shown: true });
+  }
+});

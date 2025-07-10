@@ -32,5 +32,20 @@
   "optionsHeader": { "message": "Erweiterungseinstellungen" },
   "optionsDescription": { "message": "Hier finden Sie bald Einstellungen für Szenarien und Websites." },
   "renameScenarioPrompt": { "message": "Neuer Szenarioname:" },
-  "recordStoppedAlert": { "message": "Aufnahme gestoppt (Ctrl+Shift+S)." }
+  "recordStoppedAlert": { "message": "Aufnahme gestoppt (Ctrl+Shift+S)." },
+  "onboardingStep1": { "message": "Schritt 1: Starten Sie die Aufzeichnung Ihrer Aktionen mit dieser Schaltfläche." },
+  "onboardingStep2": { "message": "Schritt 2: Stoppen Sie die Aufzeichnung, wenn Sie fertig sind." },
+  "onboardingStep3": { "message": "Schritt 3: Spielen Sie Ihr Szenario ab oder bearbeiten Sie es." },
+  "onboardingStep4": { "message": "Schritt 4: Verwenden Sie Zeitplan und Autostart für die Automatisierung." },
+  "onboardingStep5": { "message": "Schritt 5: Fügen Sie Ihrem Szenario eine Beschreibung hinzu." },
+  "descPlaceholder": { "message": "Beschreibung (optional)" },
+  "descLabel": { "message": "Beschreibung:" },
+  "tooltipStart": { "message": "Aktionen aufzeichnen" },
+  "tooltipStop": { "message": "Aufzeichnung stoppen" },
+  "tooltipPlay": { "message": "Szenario abspielen" },
+  "tooltipExport": { "message": "Alle Szenarien exportieren" },
+  "tooltipImport": { "message": "Szenarien aus Datei importieren" },
+  "tooltipAutoRun": { "message": "Alle Szenarien beim Browserstart automatisch ausführen" },
+  "tooltipSchedule": { "message": "Zeitplan für dieses Szenario festlegen" },
+  "tooltipDesc": { "message": "Beschreibung für das Szenario hinzufügen oder bearbeiten" }
 }

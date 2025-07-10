@@ -8,10 +8,10 @@ chrome.runtime.onInstalled.addListener(() => {
 // Сохраняем сценарии по домену с поддержкой имени
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'SAVE_ACTIONS') {
-    const { actions, domain, name } = msg;
+    const { actions, domain, name, desc } = msg;
     chrome.storage.local.get('scenarios', data => {
       const scenarios = data.scenarios || {};
-      scenarios[domain] = { name: name || domain, domain, actions };
+      scenarios[domain] = { name: name || domain, domain, actions, desc: desc || '' };
       chrome.storage.local.set({ scenarios }, () => {
         sendResponse({ status: 'saved' });
       });
@@ -23,11 +23,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     });
     return true;
   } else if (msg.type === 'RENAME_SCENARIO') {
-    const { domain, name } = msg;
+    const { domain, name, desc } = msg;
     chrome.storage.local.get('scenarios', data => {
       const scenarios = data.scenarios || {};
       if (scenarios[domain]) {
         scenarios[domain].name = name;
+        if (typeof desc !== 'undefined') scenarios[domain].desc = desc;
         chrome.storage.local.set({ scenarios }, () => {
           sendResponse({ status: 'renamed' });
         });

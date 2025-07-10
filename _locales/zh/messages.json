@@ -32,5 +32,20 @@
   "optionsHeader": { "message": "扩展设置" },
   "optionsDescription": { "message": "您很快将在此处找到场景和网站的设置。" },
   "renameScenarioPrompt": { "message": "新的场景名称：" },
-  "recordStoppedAlert": { "message": "录制已停止 (Ctrl+Shift+S)。" }
+  "recordStoppedAlert": { "message": "录制已停止 (Ctrl+Shift+S)。" },
+  "onboardingStep1": { "message": "第1步：点击此按钮开始录制您的操作。" },
+  "onboardingStep2": { "message": "第2步：完成后停止录制。" },
+  "onboardingStep3": { "message": "第3步：播放或编辑您的场景。" },
+  "onboardingStep4": { "message": "第4步：使用计划和自动运行实现自动化。" },
+  "onboardingStep5": { "message": "第5步：为您的场景添加描述以便于理解。" },
+  "descPlaceholder": { "message": "描述（可选）" },
+  "descLabel": { "message": "描述：" },
+  "tooltipStart": { "message": "开始录制操作" },
+  "tooltipStop": { "message": "停止录制" },
+  "tooltipPlay": { "message": "播放场景" },
+  "tooltipExport": { "message": "导出所有场景" },
+  "tooltipImport": { "message": "从文件导入场景" },
+  "tooltipAutoRun": { "message": "浏览器启动时自动运行所有场景" },
+  "tooltipSchedule": { "message": "为此场景设置计划" },
+  "tooltipDesc": { "message": "添加或编辑场景描述" }
 }

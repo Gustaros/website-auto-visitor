@@ -32,5 +32,20 @@
   "optionsHeader": { "message": "Configuración de la extensión" },
   "optionsDescription": { "message": "Pronto encontrará aquí la configuración de escenarios y sitios." },
   "renameScenarioPrompt": { "message": "Nuevo nombre del escenario:" },
-  "recordStoppedAlert": { "message": "Grabación detenida (Ctrl+Shift+S)." }
+  "recordStoppedAlert": { "message": "Grabación detenida (Ctrl+Shift+S)." },
+  "onboardingStep1": { "message": "Paso 1: Comience a grabar sus acciones haciendo clic en este botón." },
+  "onboardingStep2": { "message": "Paso 2: Detenga la grabación cuando termine." },
+  "onboardingStep3": { "message": "Paso 3: Reproduzca o edite su escenario." },
+  "onboardingStep4": { "message": "Paso 4: Use el horario y la ejecución automática para automatizar." },
+  "onboardingStep5": { "message": "Paso 5: Agregue una descripción a su escenario para mayor claridad." },
+  "descPlaceholder": { "message": "Descripción (opcional)" },
+  "descLabel": { "message": "Descripción:" },
+  "tooltipStart": { "message": "Iniciar grabación de acciones" },
+  "tooltipStop": { "message": "Detener grabación" },
+  "tooltipPlay": { "message": "Reproducir escenario" },
+  "tooltipExport": { "message": "Exportar todos los escenarios" },
+  "tooltipImport": { "message": "Importar escenarios desde archivo" },
+  "tooltipAutoRun": { "message": "Ejecutar automáticamente todos los escenarios al iniciar el navegador" },
+  "tooltipSchedule": { "message": "Configurar horario para este escenario" },
+  "tooltipDesc": { "message": "Agregar o editar la descripción del escenario" }
 }

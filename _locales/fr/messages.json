@@ -32,5 +32,20 @@
   "optionsHeader": { "message": "Paramètres de l'extension" },
   "optionsDescription": { "message": "Vous trouverez bientôt ici les paramètres des scénarios et des sites." },
   "renameScenarioPrompt": { "message": "Nouveau nom du scénario :" },
-  "recordStoppedAlert": { "message": "Enregistrement arrêté (Ctrl+Shift+S)." }
+  "recordStoppedAlert": { "message": "Enregistrement arrêté (Ctrl+Shift+S)." },
+  "onboardingStep1": { "message": "Étape 1 : Commencez à enregistrer vos actions en cliquant sur ce bouton." },
+  "onboardingStep2": { "message": "Étape 2 : Arrêtez l'enregistrement lorsque vous avez terminé." },
+  "onboardingStep3": { "message": "Étape 3 : Relisez ou modifiez votre scénario." },
+  "onboardingStep4": { "message": "Étape 4 : Utilisez le planning et l'exécution automatique pour automatiser." },
+  "onboardingStep5": { "message": "Étape 5 : Ajoutez une description à votre scénario pour plus de clarté." },
+  "descPlaceholder": { "message": "Description (optionnel)" },
+  "descLabel": { "message": "Description :" },
+  "tooltipStart": { "message": "Démarrer l'enregistrement des actions" },
+  "tooltipStop": { "message": "Arrêter l'enregistrement" },
+  "tooltipPlay": { "message": "Lire le scénario" },
+  "tooltipExport": { "message": "Exporter tous les scénarios" },
+  "tooltipImport": { "message": "Importer des scénarios depuis un fichier" },
+  "tooltipAutoRun": { "message": "Exécuter automatiquement tous les scénarios au démarrage du navigateur" },
+  "tooltipSchedule": { "message": "Définir un planning pour ce scénario" },
+  "tooltipDesc": { "message": "Ajouter ou modifier la description du scénario" }
 }

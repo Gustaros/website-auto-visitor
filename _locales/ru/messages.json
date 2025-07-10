@@ -100,5 +100,50 @@
   },
   "recordStoppedAlert": {
     "message": "Запись остановлена (Ctrl+Shift+S)."
+  },
+  "onboardingStep1": {
+    "message": "Шаг 1: Начните запись действий, нажав эту кнопку."
+  },
+  "onboardingStep2": {
+    "message": "Шаг 2: Остановите запись, когда закончите."
+  },
+  "onboardingStep3": {
+    "message": "Шаг 3: Воспроизведите или отредактируйте сценарий."
+  },
+  "onboardingStep4": {
+    "message": "Шаг 4: Используйте расписание и автозапуск для автоматизации."
+  },
+  "onboardingStep5": {
+    "message": "Шаг 5: Добавьте описание к сценарию для удобства."
+  },
+  "descPlaceholder": {
+    "message": "Описание (необязательно)"
+  },
+  "descLabel": {
+    "message": "Описание:"
+  },
+  "tooltipStart": {
+    "message": "Начать запись действий"
+  },
+  "tooltipStop": {
+    "message": "Остановить запись"
+  },
+  "tooltipPlay": {
+    "message": "Воспроизвести сценарий"
+  },
+  "tooltipExport": {
+    "message": "Экспортировать все сценарии"
+  },
+  "tooltipImport": {
+    "message": "Импортировать сценарии из файла"
+  },
+  "tooltipAutoRun": {
+    "message": "Автоматически запускать все сценарии при запуске браузера"
+  },
+  "tooltipSchedule": {
+    "message": "Настроить расписание для этого сценария"
+  },
+  "tooltipDesc": {
+    "message": "Добавить или изменить описание сценария"
   }
 }
