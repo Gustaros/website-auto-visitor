@@ -80,7 +80,8 @@ document.addEventListener('keydown', function(e) {
     window.removeEventListener('click', handleClick, true);
     window.removeEventListener('input', handleInput, true);
     // Отправляем сообщение в background для сохранения
-    chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions});
-    alert('Запись остановлена (Ctrl+Shift+S).');
+    chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: window.location.hostname}, () => {
+      alert('Запись остановлена (Ctrl+Shift+S).');
+    });
   }
 });

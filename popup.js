@@ -1,4 +1,4 @@
-// Скрипт для popup.html: управление кнопками и взаимодействие с background.js
+// Скрипт для popup.html: управление кнопками и взаимодействие сbackground.js
 
 document.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('start-record');
@@ -36,15 +36,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // Загружаем сценарии
     chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
       scenarios = resp.scenarios || {};
+      console.log('[Website Auto Visitor] Загруженные сценарии:', scenarios); // диагностика
       updateScenarioList();
     });
   });
 
+  // Универсальная функция для отправки сообщения с повтором
+  function sendMessageWithRetry(tabId, message, callback, retries = 3) {
+    chrome.tabs.sendMessage(tabId, message, resp => {
+      if (chrome.runtime.lastError) {
+        if (retries > 0) {
+          setTimeout(() => sendMessageWithRetry(tabId, message, callback, retries - 1), 300);
+        } else {
+          callback(null, chrome.runtime.lastError.message);
+        }
+        return;
+      }
+      callback(resp, null);
+    });
+  }
+
   startBtn.onclick = () => {
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-      chrome.tabs.sendMessage(tabs[0].id, {type: 'START_RECORDING'}, resp => {
-        if (chrome.runtime.lastError) {
-          statusDiv.textContent = 'Ошибка: расширение не может работать на этой странице.';
+      sendMessageWithRetry(tabs[0].id, {type: 'START_RECORDING'}, (resp, err) => {
+        if (err) {
+          statusDiv.textContent = 'Ошибка: расширение не может работать на этой странице.\n' + err;
           return;
         }
         statusDiv.textContent = 'Запись...';
@@ -56,10 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   stopBtn.onclick = () => {
+    if (!currentDomain) {
+      statusDiv.textContent = 'Ошибка: домен не определён, сценарий не будет сохранён.';
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      playBtn.disabled = true;
+      return;
+    }
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-      chrome.tabs.sendMessage(tabs[0].id, {type: 'STOP_RECORDING'}, resp => {
-        if (chrome.runtime.lastError) {
-          statusDiv.textContent = 'Ошибка: расширение не может работать на этой странице.';
+      sendMessageWithRetry(tabs[0].id, {type: 'STOP_RECORDING'}, (resp, err) => {
+        if (err) {
+          statusDiv.textContent = 'Ошибка: расширение не может работать на этой странице.\n' + err;
           return;
         }
         recordedActions = resp.actions || [];
@@ -67,14 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
         startBtn.disabled = false;
         stopBtn.disabled = true;
         playBtn.disabled = recordedActions.length === 0;
-        // Сохраняем сценарий по домену
-        chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: currentDomain}, () => {
-          // Обновляем список сценариев
-          chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
-            scenarios = resp.scenarios || {};
-            updateScenarioList();
+        // Сохраняем сценарий по домену, только если домен определён
+        if (currentDomain) {
+          chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: currentDomain}, () => {
+            // Обновляем список сценариев
+            chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
+              scenarios = resp.scenarios || {};
+              updateScenarioList();
+            });
           });
-        });
+        }
       });
     });
   };
@@ -82,9 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
   playBtn.onclick = () => {
     if (!recordedActions.length) return;
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-      chrome.tabs.sendMessage(tabs[0].id, {type: 'PLAY_ACTIONS', actions: recordedActions}, resp => {
-        if (chrome.runtime.lastError) {
-          statusDiv.textContent = 'Ошибка: расширение не может работать на этой странице.';
+      sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: recordedActions}, (resp, err) => {
+        if (err) {
+          statusDiv.textContent = 'Ошибка: расширение не может работать на этой странице.\n' + err;
           return;
         }
         statusDiv.textContent = 'Воспроизведение...';
@@ -96,14 +121,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!scenarioList) return;
     scenarioList.innerHTML = '';
     Object.keys(scenarios).forEach(domain => {
-      if (!domain) return;
+      if (!domain || domain === 'undefined') return;
       const li = document.createElement('li');
       li.textContent = domain + (domain === currentDomain ? ' (текущий)' : '');
       li.style.cursor = 'pointer';
       li.onclick = () => {
-        recordedActions = scenarios[domain];
+        recordedActions = scenarios[domain] || [];
         playBtn.disabled = !recordedActions.length;
-        statusDiv.textContent = 'Выбран сценарий для: ' + domain;
+        statusDiv.textContent = 'Выбран сценарий для: ' + domain + '. Действий: ' + recordedActions.length;
+        console.log('[Website Auto Visitor] Выбран сценарий:', domain, recordedActions);
       };
       scenarioList.appendChild(li);
     });
