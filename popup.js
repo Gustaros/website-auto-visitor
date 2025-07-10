@@ -532,16 +532,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!autoRunSwitchDiv) {
     autoRunSwitchDiv = document.createElement('div');
     autoRunSwitchDiv.id = 'autoRunSwitchDiv';
-    autoRunSwitchDiv.style.margin = '10px 0 0 0';
+    autoRunSwitchDiv.style.margin = '18px 0 0 0';
     autoRunSwitchDiv.style.display = 'flex';
     autoRunSwitchDiv.style.alignItems = 'center';
+    autoRunSwitchDiv.style.justifyContent = 'center';
     autoRunSwitchDiv.innerHTML = `
-      <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
-        <input type="checkbox" id="autoRunAllSwitch" style="width:18px;height:18px;"> 
-        Автоматически запускать все сценарии при запуске браузера
+      <label class="toggle-switch-label">
+        <input type="checkbox" id="autoRunAllSwitch" class="toggle-switch-input">
+        <span class="toggle-switch-slider"></span>
+        <span style="margin-left:12px;font-size:14px;">Автоматически запускать все сценарии при запуске браузера</span>
       </label>
     `;
-    document.body.insertBefore(autoRunSwitchDiv, document.body.firstChild.nextSibling);
+    // Добавляем переключатель в самый низ popup
+    document.body.appendChild(autoRunSwitchDiv);
   }
   let autoRunAllSwitch = document.getElementById('autoRunAllSwitch');
   // Инициализация состояния переключателя
