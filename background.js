@@ -62,16 +62,31 @@ setInterval(() => {
     Object.entries(scheduled).forEach(([domain, time]) => {
       const [h, m] = time.split(':').map(Number);
       if (now.getHours() === h && now.getMinutes() === m) {
-        // Найти активную вкладку с этим доменом и отправить PLAY_ACTIONS
+        // Проверяем, есть ли открытая вкладка с этим доменом
         chrome.tabs.query({}, tabs => {
+          let found = false;
           tabs.forEach(tab => {
             try {
               const url = new URL(tab.url);
               if (url.hostname === domain) {
-                chrome.tabs.sendMessage(tab.id, { type: 'PLAY_ACTIONS', actions: (data.scenarios||{})[domain] || [] });
+                found = true;
+                // Запускаем сценарий на уже открытой вкладке
+                chrome.tabs.sendMessage(tab.id, { type: 'PLAY_ACTIONS', actions: (data.scenarios||{})[domain]?.actions || [] });
               }
             } catch {}
           });
+          if (!found) {
+            // Открываем новую вкладку и запускаем сценарий после загрузки
+            chrome.tabs.create({ url: 'https://' + domain }, newTab => {
+              // Ждём загрузки страницы, затем отправляем PLAY_ACTIONS
+              chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+                if (tabId === newTab.id && info.status === 'complete') {
+                  chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: (data.scenarios||{})[domain]?.actions || [] });
+                  chrome.tabs.onUpdated.removeListener(listener);
+                }
+              });
+            });
+          }
         });
       }
     });
