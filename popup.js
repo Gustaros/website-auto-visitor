@@ -66,10 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       sendMessageWithRetry(tabs[0].id, {type: 'START_RECORDING'}, (resp, err) => {
         if (err) {
-          statusDiv.textContent = 'Ошибка: расширение не может работать на этой странице.\n' + err;
+          statusDiv.textContent = t('errorOnPage') + '\n' + err;
           return;
         }
-        statusDiv.textContent = 'Запись...';
+        statusDiv.textContent = t('statusRecording');
         startBtn.disabled = true;
         stopBtn.disabled = false;
         playBtn.disabled = true;
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       sendMessageWithRetry(tabs[0].id, {type: 'STOP_RECORDING'}, (resp, err) => {
         if (err) {
-          statusDiv.textContent = 'Ошибка: расширение не может работать на этой странице.\n' + err;
+          statusDiv.textContent = t('errorOnPage') + '\n' + err;
           return;
         }
         recordedActions = resp.actions || [];
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
       delBtn.style.marginLeft = '8px';
       delBtn.onclick = (e) => {
         e.stopPropagation();
-        if (confirm('Удалить сценарий для ' + (scenario.name || domain) + '?')) {
+        if (confirm(t('deleteScenario', { name }))) {
           delete scenarios[domain];
           chrome.storage.local.set({ scenarios }, () => updateScenarioList());
           if (selectedDomain === domain) {
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renameBtn.style.marginLeft = '4px';
       renameBtn.onclick = (e) => {
         e.stopPropagation();
-        const newName = prompt('Новое имя сценария:', scenario.name || domain);
+        const newName = prompt(t('renameScenarioPrompt'), scenario.name || domain);
         if (newName && newName !== scenario.name) {
           chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain, name: newName }, () => {
             scenarios[domain].name = newName;
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: recordedActions}, (resp, err) => {
         if (err) {
-          statusDiv.textContent = 'Ошибка: расширение не может работать на этой странице.\n' + err;
+          statusDiv.textContent = t('errorOnPage') + '\n' + err;
           return;
         }
         setStatusPlaying();
@@ -271,9 +271,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const imported = JSON.parse(ev.target.result);
             Object.assign(scenarios, imported);
             chrome.storage.local.set({ scenarios }, () => updateScenarioList());
-            statusDiv.textContent = 'Сценарии импортированы.';
+            statusDiv.textContent = t('importSuccess');
           } catch {
-            statusDiv.textContent = 'Ошибка импорта файла.';
+            statusDiv.textContent = t('importError');
           }
         };
         reader.readAsText(file);
@@ -362,7 +362,7 @@ function updateScenarioList() {
     delBtn.style.marginLeft = '8px';
     delBtn.onclick = (e) => {
       e.stopPropagation();
-      if (confirm('Удалить сценарий для ' + (scenario.name || domain) + '?')) {
+      if (confirm(t('deleteScenario', { name }))) {
         delete scenarios[domain];
         chrome.storage.local.set({ scenarios }, () => updateScenarioList());
         if (selectedDomain === domain) {
@@ -380,7 +380,7 @@ function updateScenarioList() {
     renameBtn.style.marginLeft = '4px';
     renameBtn.onclick = (e) => {
       e.stopPropagation();
-      const newName = prompt('Новое имя сценария:', scenario.name || domain);
+      const newName = prompt(t('renameScenarioPrompt'), scenario.name || domain);
       if (newName && newName !== scenario.name) {
         chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain, name: newName }, () => {
           scenarios[domain].name = newName;
@@ -415,7 +415,7 @@ playBtn.onclick = () => {
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
     sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: recordedActions}, (resp, err) => {
       if (err) {
-        statusDiv.textContent = 'Ошибка: расширение не может работать на этой странице.\n' + err;
+        statusDiv.textContent = t('errorOnPage') + '\n' + err;
         return;
       }
       setStatusPlaying();
@@ -488,9 +488,9 @@ if (!importBtn) {
           const imported = JSON.parse(ev.target.result);
           Object.assign(scenarios, imported);
           chrome.storage.local.set({ scenarios }, () => updateScenarioList());
-          statusDiv.textContent = 'Сценарии импортированы.';
+          statusDiv.textContent = t('importSuccess');
         } catch {
-          statusDiv.textContent = 'Ошибка импорта файла.';
+          statusDiv.textContent = t('importError');
         }
       };
       reader.readAsText(file);
@@ -545,11 +545,11 @@ autoRunAllSwitch.onchange = () => {
       onboardingDiv.innerHTML = `
         <div style="max-width:320px;padding:24px 18px 18px 18px;border-radius:10px;box-shadow:0 2px 12px #0001;background:#fff;text-align:center;">
           <h3 style="color:#1976d2;">👋 ${t('appName')}</h3>
-          <p style="font-size:15px;line-height:1.5;margin:10px 0 18px 0;">${t('onboardingWelcome') || 'This extension helps you automate daily actions on your favorite sites!'}<br><br>
-          <b>${t('startRecording') || 'Start recording'}</b> — ${t('onboardingRecord') || 'Record your actions on the site.'}<br>
-          <b>${t('playActions') || 'Play actions'}</b> — ${t('onboardingPlay') || 'Replay your scenario.'}<br>
-          <b>${t('autoRunAll') || 'Automatically run all scenarios'}</b> — ${t('onboardingAuto') || 'Enable daily automation.'}</p>
-          <button id="onboardingCloseBtn" style="margin-top:10px;padding:8px 24px;font-size:15px;background:#1976d2;color:#fff;border:none;border-radius:5px;">OK</button>
+          <p style="font-size:15px;line-height:1.5;margin:10px 0 18px 0;">${t('onboardingWelcome')}<br><br>
+          <b>${t('startRecording')}</b> — ${t('onboardingRecord')}<br>
+          <b>${t('playActions')}</b> — ${t('onboardingPlay')}<br>
+          <b>${t('autoRunAll')}</b> — ${t('onboardingAuto')}</p>
+          <button id="onboardingCloseBtn" style="margin-top:10px;padding:8px 24px;font-size:15px;background:#1976d2;color:#fff;border:none;border-radius:5px;">${t('onboardingOk')}</button>
         </div>
       `;
       document.body.appendChild(onboardingDiv);
@@ -559,3 +559,7 @@ autoRunAllSwitch.onchange = () => {
       };
     }
   });
+
+  // Локализация надписи о прокрутке
+  const scrollMsg = document.getElementById('scroll-recorded-msg');
+  if (scrollMsg) scrollMsg.textContent = t('scrollRecorded');

@@ -1,11 +1,22 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Настройки Website Auto Visitor</title>
+  <title data-i18n="optionsTitle">Extension Settings</title>
 </head>
 <body>
-  <h2>Настройки расширения</h2>
-  <p>Здесь в будущем появятся настройки сценариев и сайтов.</p>
+  <h2 data-i18n="optionsHeader">Extension Settings</h2>
+  <p data-i18n="optionsDescription">Here you will soon find scenario and site settings.</p>
+  <script>
+    // Simple i18n for static options page
+    function t(key) {
+      if (typeof chrome !== 'undefined' && chrome.i18n) return chrome.i18n.getMessage(key) || key;
+      return key;
+    }
+    document.title = t('optionsTitle');
+    document.querySelector('[data-i18n="optionsTitle"]').textContent = t('optionsTitle');
+    document.querySelector('[data-i18n="optionsHeader"]').textContent = t('optionsHeader');
+    document.querySelector('[data-i18n="optionsDescription"]').textContent = t('optionsDescription');
+  </script>
 </body>
 </html>

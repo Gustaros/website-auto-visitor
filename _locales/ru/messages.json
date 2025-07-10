@@ -70,5 +70,35 @@
   },
   "autoRunSchedule": {
     "message": "Автозапуск по расписанию:"
+  },
+  "scrollRecorded": {
+    "message": "Прокрутка теперь тоже записывается!"
+  },
+  "importSuccess": {
+    "message": "Сценарии импортированы."
+  },
+  "importError": {
+    "message": "Ошибка импорта файла."
+  },
+  "errorOnPage": {
+    "message": "Ошибка: расширение не может работать на этой странице."
+  },
+  "onboardingOk": {
+    "message": "ОК"
+  },
+  "optionsTitle": {
+    "message": "Настройки расширения"
+  },
+  "optionsHeader": {
+    "message": "Настройки расширения"
+  },
+  "optionsDescription": {
+    "message": "Здесь в будущем появятся настройки сценариев и сайтов."
+  },
+  "renameScenarioPrompt": {
+    "message": "Новое имя сценария:"
+  },
+  "recordStoppedAlert": {
+    "message": "Запись остановлена (Ctrl+Shift+S)."
   }
 }

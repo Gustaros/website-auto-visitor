@@ -70,5 +70,35 @@
   },
   "autoRunSchedule": {
     "message": "Auto-run by schedule:"
+  },
+  "scrollRecorded": {
+    "message": "Scroll is now recorded too!"
+  },
+  "importSuccess": {
+    "message": "Scenarios imported successfully."
+  },
+  "importError": {
+    "message": "Import file error."
+  },
+  "errorOnPage": {
+    "message": "Error: extension cannot work on this page."
+  },
+  "onboardingOk": {
+    "message": "OK"
+  },
+  "optionsTitle": {
+    "message": "Extension Settings"
+  },
+  "optionsHeader": {
+    "message": "Extension Settings"
+  },
+  "optionsDescription": {
+    "message": "Here you will soon find scenario and site settings."
+  },
+  "renameScenarioPrompt": {
+    "message": "New scenario name:"
+  },
+  "recordStoppedAlert": {
+    "message": "Recording stopped (Ctrl+Shift+S)."
   }
 }

@@ -117,7 +117,11 @@ document.addEventListener('keydown', function(e) {
     window.removeEventListener('input', handleInput, true);
     // Отправляем сообщение в background для сохранения
     chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: window.location.hostname}, () => {
-      alert('Запись остановлена (Ctrl+Shift+S).');
+      if (typeof chrome !== 'undefined' && chrome.i18n) {
+        alert(chrome.i18n.getMessage('recordStoppedAlert'));
+      } else {
+        alert('Recording stopped (Ctrl+Shift+S).');
+      }
     });
   }
 });
