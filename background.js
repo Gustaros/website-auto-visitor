@@ -92,3 +92,34 @@ setInterval(() => {
     });
   });
 }, 60000);
+
+// Автоматический запуск всех сценариев раз в день при первом запуске браузера
+let lastAutoRunDate = null;
+
+function getTodayString() {
+  const now = new Date();
+  return now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
+}
+
+chrome.runtime.onStartup.addListener(() => {
+  chrome.storage.local.get(['scenarios', 'lastAutoRunDate'], data => {
+    const today = getTodayString();
+    if (data.lastAutoRunDate === today) return; // Уже запускали сегодня
+    const scenarios = data.scenarios || {};
+    Object.keys(scenarios).forEach(domain => {
+      // Открываем вкладку для каждого домена
+      chrome.tabs.create({ url: 'https://' + domain, active: false }, newTab => {
+        // Ждём загрузки страницы, затем отправляем PLAY_ACTIONS
+        chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+          if (tabId === newTab.id && info.status === 'complete') {
+            chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenarios[domain]?.actions || [] });
+            // Закрываем вкладку через 10 секунд после запуска сценария
+            setTimeout(() => chrome.tabs.remove(tabId), 10000);
+            chrome.tabs.onUpdated.removeListener(listener);
+          }
+        });
+      });
+    });
+    chrome.storage.local.set({ lastAutoRunDate: today });
+  });
+});
