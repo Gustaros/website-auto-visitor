@@ -6,6 +6,10 @@
   <style>
     body { font-family: sans-serif; min-width: 250px; }
     button { margin: 5px 0; width: 100%; }
+    ul#scenario-list { margin:10px 0; padding-left:20px; }
+    ul#scenario-list li { margin-bottom: 2px; transition: background 0.2s; }
+    ul#scenario-list li.selected { background: #d0ebff; font-weight: bold; }
+    ul#scenario-list button { width: auto; margin-left: 8px; }
   </style>
 </head>
 <body>
@@ -14,7 +18,7 @@
   <button id="stop-record" disabled>Остановить запись</button>
   <button id="play-actions" disabled>Воспроизвести</button>
   <div id="status"></div>
-  <ul id="scenario-list" style="margin:10px 0; padding-left:20px;">
+  <ul id="scenario-list">
     <li style="color: #888; font-size: 12px;">Прокрутка теперь тоже записывается!</li>
   </ul>
   <script src="popup.js"></script>

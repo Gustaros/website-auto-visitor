@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let recordedActions = [];
   let currentDomain = '';
   let scenarios = {};
+  let selectedDomain = '';
 
   // Получаем домен текущей вкладки
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
@@ -104,8 +105,57 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  function updateScenarioList() {
+    if (!scenarioList) return;
+    scenarioList.innerHTML = '';
+    Object.keys(scenarios).forEach(domain => {
+      if (!domain || domain === 'undefined') return;
+      const li = document.createElement('li');
+      li.textContent = domain + (domain === currentDomain ? ' (текущий)' : '');
+      li.style.cursor = 'pointer';
+      li.style.padding = '2px 4px';
+      li.style.borderRadius = '4px';
+      if (domain === selectedDomain) {
+        li.style.background = '#d0ebff';
+        li.style.fontWeight = 'bold';
+      }
+      // Кнопка удаления сценария
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '✕';
+      delBtn.title = 'Удалить сценарий';
+      delBtn.style.marginLeft = '8px';
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (confirm('Удалить сценарий для ' + domain + '?')) {
+          delete scenarios[domain];
+          chrome.storage.local.set({ scenarios }, () => updateScenarioList());
+          if (selectedDomain === domain) {
+            selectedDomain = '';
+            recordedActions = [];
+            playBtn.disabled = true;
+          }
+        }
+      };
+      li.onclick = () => {
+        selectedDomain = domain;
+        recordedActions = scenarios[domain] || [];
+        playBtn.disabled = !recordedActions.length;
+        updateScenarioList();
+        statusDiv.textContent = 'Выбран сценарий для: ' + domain + '. Действий: ' + recordedActions.length;
+        console.log('[Website Auto Visitor] Выбран сценарий:', domain, recordedActions);
+      };
+      li.appendChild(delBtn);
+      scenarioList.appendChild(li);
+    });
+  }
+
   playBtn.onclick = () => {
     if (!recordedActions.length) return;
+    if (!selectedDomain) {
+      statusDiv.textContent = 'Сначала выберите сценарий.';
+      return;
+    }
+    if (!confirm('Воспроизвести сценарий для ' + selectedDomain + '?')) return;
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: recordedActions}, (resp, err) => {
         if (err) {
@@ -142,34 +192,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  function updateScenarioList() {
-    if (!scenarioList) return;
-    scenarioList.innerHTML = '';
-    Object.keys(scenarios).forEach(domain => {
-      if (!domain || domain === 'undefined') return;
-      const li = document.createElement('li');
-      li.textContent = domain + (domain === currentDomain ? ' (текущий)' : '');
-      li.style.cursor = 'pointer';
-      // Кнопка удаления сценария
-      const delBtn = document.createElement('button');
-      delBtn.textContent = '✕';
-      delBtn.title = 'Удалить сценарий';
-      delBtn.style.marginLeft = '8px';
-      delBtn.onclick = (e) => {
-        e.stopPropagation();
-        if (confirm('Удалить сценарий для ' + domain + '?')) {
-          delete scenarios[domain];
+  // --- Экспорт/импорт сценариев ---
+  const exportBtn = document.createElement('button');
+  exportBtn.textContent = 'Экспорт сценариев';
+  exportBtn.style.margin = '5px 0';
+  exportBtn.onclick = () => {
+    const data = JSON.stringify(scenarios, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'website-auto-visitor-scenarios.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  document.body.appendChild(exportBtn);
+
+  const importBtn = document.createElement('button');
+  importBtn.textContent = 'Импорт сценариев';
+  importBtn.style.margin = '5px 0';
+  importBtn.onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const imported = JSON.parse(ev.target.result);
+          Object.assign(scenarios, imported);
           chrome.storage.local.set({ scenarios }, () => updateScenarioList());
+          statusDiv.textContent = 'Сценарии импортированы.';
+        } catch {
+          statusDiv.textContent = 'Ошибка импорта файла.';
         }
       };
-      li.onclick = () => {
-        recordedActions = scenarios[domain] || [];
-        playBtn.disabled = !recordedActions.length;
-        statusDiv.textContent = 'Выбран сценарий для: ' + domain + '. Действий: ' + recordedActions.length;
-        console.log('[Website Auto Visitor] Выбран сценарий:', domain, recordedActions);
-      };
-      li.appendChild(delBtn);
-      scenarioList.appendChild(li);
-    });
-  }
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+  document.body.appendChild(importBtn);
 });
