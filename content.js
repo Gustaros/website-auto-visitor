@@ -1,4 +1,5 @@
 // Контент-скрипт для записи и воспроизведения действий пользователя
+console.log('[Website Auto Visitor] content.js загружен на', window.location.href);
 
 // Глобальные переменные для хранения состояния записи и списка действий
 let isRecording = false;
