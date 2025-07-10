@@ -164,7 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       // Кнопка удаления сценария
       const delBtn = document.createElement('button');
-      delBtn.textContent = '✕';
+      delBtn.innerHTML = '';
+      delBtn.appendChild(createIcon('delete'));
       delBtn.title = t('deleteScenario', { name });
       delBtn.style.marginLeft = '8px';
       delBtn.onclick = (e) => {
@@ -182,7 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       // Кнопка переименования
       const renameBtn = document.createElement('button');
-      renameBtn.textContent = '✎';
+      renameBtn.innerHTML = '';
+      renameBtn.appendChild(createIcon('edit'));
       renameBtn.title = t('renameScenario');
       renameBtn.style.marginLeft = '4px';
       renameBtn.onclick = (e) => {
@@ -198,7 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       // Кнопка/иконка для редактирования описания сценария
       const descBtn = document.createElement('button');
-      descBtn.textContent = '📝';
+      descBtn.innerHTML = '';
+      descBtn.appendChild(createIcon('description'));
       descBtn.title = t('tooltipDesc');
       descBtn.onclick = (e) => {
         e.stopPropagation();
@@ -387,6 +390,37 @@ document.addEventListener('DOMContentLoaded', () => {
     descDiv.style.display = 'none';
   }
 
+  // Theme switch logic
+  const themeSwitch = document.getElementById('themeSwitch');
+  const themeSwitchLabel = document.getElementById('themeSwitchLabel');
+  if (themeSwitch && themeSwitchLabel) {
+    chrome.storage.local.get('theme', data => {
+      let theme = data.theme || 'auto';
+      if (theme === 'dark') themeSwitch.checked = true;
+      else themeSwitch.checked = false;
+      applyTheme(theme);
+    });
+    themeSwitch.onchange = () => {
+      const theme = themeSwitch.checked ? 'dark' : 'light';
+      chrome.storage.local.set({ theme });
+      applyTheme(theme);
+    };
+  }
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  }
+  // Автоопределение темы
+  if (!localStorage.getItem('theme')) {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(prefersDark ? 'dark' : 'light');
+  }
+
   // Пошаговый интерактивный onboarding (примерная реализация)
   function runOnboarding() {
     const steps = [
@@ -521,7 +555,8 @@ function updateScenarioList() {
     }
     // Кнопка удаления сценария
     const delBtn = document.createElement('button');
-    delBtn.textContent = '✕';
+    delBtn.innerHTML = '';
+    delBtn.appendChild(createIcon('delete'));
     delBtn.title = t('deleteScenario', { name });
     delBtn.style.marginLeft = '8px';
     delBtn.onclick = (e) => {
@@ -539,7 +574,8 @@ function updateScenarioList() {
     };
     // Кнопка переименования
     const renameBtn = document.createElement('button');
-    renameBtn.textContent = '✎';
+    renameBtn.innerHTML = '';
+    renameBtn.appendChild(createIcon('edit'));
     renameBtn.title = t('renameScenario');
     renameBtn.style.marginLeft = '4px';
     renameBtn.onclick = (e) => {
@@ -555,7 +591,8 @@ function updateScenarioList() {
     };
     // Кнопка/иконка для редактирования описания сценария
     const descBtn = document.createElement('button');
-    descBtn.textContent = '📝';
+    descBtn.innerHTML = '';
+    descBtn.appendChild(createIcon('description'));
     descBtn.title = t('tooltipDesc');
     descBtn.onclick = (e) => {
       e.stopPropagation();
@@ -779,3 +816,13 @@ chrome.storage.local.get('onboardingV2Shown', data => {
     chrome.storage.local.set({ onboardingV2Shown: true });
   }
 });
+
+// Material Icons for scenario list actions
+function createIcon(name) {
+  const i = document.createElement('span');
+  i.className = 'material-icons';
+  i.style.fontSize = '18px';
+  i.style.verticalAlign = 'middle';
+  i.textContent = name;
+  return i;
+}

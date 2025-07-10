@@ -1,9 +1,47 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap');
+:root {
+  --color-bg: #f6f8fa;
+  --color-fg: #222;
+  --color-accent: #1976d2;
+  --color-accent-light: #e3f2fd;
+  --color-status: #388e3c;
+  --color-btn: #1976d2;
+  --color-btn-hover: #1565c0;
+  --color-btn-disabled: #b0bec5;
+  --color-btn-text: #fff;
+  --color-list-bg: #fff;
+  --color-list-border: #e0e0e0;
+  --color-list-selected: #d0ebff;
+  --color-list-action: #e57373;
+  --color-list-action-edit: #ffd54f;
+  --color-list-action-edit-text: #333;
+  --color-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #181a1b;
+    --color-fg: #f1f1f1;
+    --color-accent: #90caf9;
+    --color-accent-light: #263238;
+    --color-status: #81c784;
+    --color-btn: #1565c0;
+    --color-btn-hover: #1976d2;
+    --color-btn-disabled: #37474f;
+    --color-btn-text: #fff;
+    --color-list-bg: #23272a;
+    --color-list-border: #333;
+    --color-list-selected: #263238;
+    --color-list-action: #e57373;
+    --color-list-action-edit: #ffd54f;
+    --color-list-action-edit-text: #222;
+    --color-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  }
+}
 body {
   font-family: 'Roboto', Arial, sans-serif;
   min-width: 320px;
-  background: #f6f8fa;
-  color: #222;
+  background: var(--color-bg);
+  color: var(--color-fg);
   margin: 0;
   padding: 0 10px 10px 10px;
 }
@@ -11,7 +49,7 @@ h3 {
   margin-top: 12px;
   margin-bottom: 10px;
   font-weight: 500;
-  color: #1976d2;
+  color: var(--color-accent);
   letter-spacing: 1px;
   text-align: center;
 }
@@ -21,16 +59,16 @@ button {
   padding: 8px 0;
   border: none;
   border-radius: 5px;
-  background: #1976d2;
-  color: #fff;
+  background: var(--color-btn);
+  color: var(--color-btn-text);
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  box-shadow: var(--color-shadow);
 }
 button:disabled {
-  background: #b0bec5;
+  background: var(--color-btn-disabled);
   color: #eee;
   cursor: not-allowed;
 }
@@ -38,7 +76,7 @@ button:disabled {
   margin: 8px 0 4px 0;
   min-height: 18px;
   font-size: 13px;
-  color: #388e3c;
+  color: var(--color-status);
   text-align: center;
   word-break: break-word;
 }
@@ -48,9 +86,9 @@ ul#scenario-list {
   list-style: none;
   max-height: 120px;
   overflow-y: auto;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-list-border);
   border-radius: 5px;
-  background: #fff;
+  background: var(--color-list-bg);
 }
 ul#scenario-list li {
   margin: 0;
@@ -67,7 +105,7 @@ ul#scenario-list li:last-child {
   border-bottom: none;
 }
 ul#scenario-list li.selected {
-  background: #e3f2fd;
+  background: var(--color-list-selected);
   font-weight: 500;
 }
 ul#scenario-list button {
@@ -76,15 +114,19 @@ ul#scenario-list button {
   margin-left: 6px;
   padding: 3px 7px;
   font-size: 13px;
-  background: #e57373;
+  background: var(--color-list-action);
   color: #fff;
   border-radius: 3px;
   border: none;
   box-shadow: none;
 }
-ul#scenario-list button[title="Переименовать сценарий"] {
-  background: #ffd54f;
-  color: #333;
+ul#scenario-list button[title*="Переименовать"],
+ul#scenario-list button[title*="Rename"],
+ul#scenario-list button[title*="Renommer"],
+ul#scenario-list button[title*="Umbenennen"],
+ul#scenario-list button[title*="重命名"] {
+  background: var(--color-list-action-edit);
+  color: var(--color-list-action-edit-text);
 }
 #searchDiv input {
   width: 98%;
@@ -132,9 +174,6 @@ ul#scenario-list button[title="Переименовать сценарий"] {
   margin-left: 8px;
   padding: 2px 7px;
   min-width: 24px;
-}
-#actions-list li.drag-over {
-  background: #ffe082;
 }
 #scheduleDiv, #exportBtn, #importBtn {
   width: 100%;
@@ -234,7 +273,43 @@ ul#scenario-list button[title="Переименовать сценарий"] {
   padding: 0 2px;
   box-sizing: border-box;
 }
+#themeSwitchDiv {
+  width: 100%;
+  margin: 10px 0 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+#themeSwitchLabel {
+  font-size: 13px;
+  margin-right: 8px;
+  color: var(--color-fg);
+}
 @media (max-width: 400px) {
   body { min-width: 220px; }
   #actions-list, ul#scenario-list { max-height: 80px; }
+}
+@media (max-width: 320px) {
+  body { min-width: 180px; font-size: 13px; }
+  h3 { font-size: 16px; }
+}
+/* Анимация появления/удаления */
+.fade-in {
+  animation: fadeIn 0.3s;
+}
+.fade-out {
+  animation: fadeOut 0.3s;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; transform: translateY(10px); }
+}
+/* Drag&drop подсветка */
+ul#scenario-list li.drag-over {
+  background: #ffe082 !important;
+  transition: background 0.2s;
 }
