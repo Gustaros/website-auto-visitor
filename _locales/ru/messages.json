@@ -52,5 +52,23 @@
   },
   "deleteAction": {
     "message": "Удалить действие"
+  },
+  "onboardingWelcome": {
+    "message": "Это расширение поможет вам автоматизировать ежедневные действия на любимых сайтах!"
+  },
+  "onboardingRecord": {
+    "message": "Запишите свои действия на сайте."
+  },
+  "onboardingPlay": {
+    "message": "Воспроизведите свой сценарий."
+  },
+  "onboardingAuto": {
+    "message": "Включите ежедневную автоматизацию."
+  },
+  "setSchedule": {
+    "message": "Установить"
+  },
+  "autoRunSchedule": {
+    "message": "Автозапуск по расписанию:"
   }
 }

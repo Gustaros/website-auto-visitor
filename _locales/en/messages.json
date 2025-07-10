@@ -52,5 +52,23 @@
   },
   "deleteAction": {
     "message": "Delete action"
+  },
+  "onboardingWelcome": {
+    "message": "This extension helps you automate daily actions on your favorite sites!"
+  },
+  "onboardingRecord": {
+    "message": "Record your actions on the site."
+  },
+  "onboardingPlay": {
+    "message": "Replay your scenario."
+  },
+  "onboardingAuto": {
+    "message": "Enable daily automation."
+  },
+  "setSchedule": {
+    "message": "Set"
+  },
+  "autoRunSchedule": {
+    "message": "Auto-run by schedule:"
   }
 }

@@ -312,10 +312,21 @@ document.addEventListener('DOMContentLoaded', () => {
   startBtn.textContent = t('startRecording');
   stopBtn.textContent = t('stopRecording');
   playBtn.textContent = t('playActions');
-  exportBtn.textContent = t('exportScenarios');
-  importBtn.textContent = t('importScenarios');
+  if (exportBtn) exportBtn.textContent = t('exportScenarios');
+  if (importBtn) importBtn.textContent = t('importScenarios');
   if (searchInput) searchInput.placeholder = t('searchScenario');
   if (autoRunAllSwitch) autoRunAllSwitch.parentElement.querySelector('span:last-child').textContent = t('autoRunAll');
+  if (setScheduleBtn) setScheduleBtn.textContent = t('setSchedule') || 'Установить';
+  if (scheduleDiv) scheduleDiv.querySelector('b').textContent = t('autoRunSchedule') || 'Автозапуск по расписанию:';
+
+  // Локализация тултипов для кнопок
+  if (exportBtn) exportBtn.title = t('exportScenarios');
+  if (importBtn) importBtn.title = t('importScenarios');
+  if (startBtn) startBtn.title = t('startRecording');
+  if (stopBtn) stopBtn.title = t('stopRecording');
+  if (playBtn) playBtn.title = t('playActions');
+  if (setScheduleBtn) setScheduleBtn.title = t('setSchedule') || 'Установить';
+  if (autoRunAllSwitch) autoRunAllSwitch.title = t('autoRunAll');
 });
 
 // Локализация статусов и сообщений
@@ -514,3 +525,37 @@ chrome.storage.local.get('autoRunAllEnabled', data => {
 autoRunAllSwitch.onchange = () => {
   chrome.storage.local.set({ autoRunAllEnabled: autoRunAllSwitch.checked });
 };
+
+  // Onboarding: показать приветствие при первом запуске
+  chrome.storage.local.get('onboardingShown', data => {
+    if (!data.onboardingShown) {
+      const onboardingDiv = document.createElement('div');
+      onboardingDiv.id = 'onboardingDiv';
+      onboardingDiv.style.position = 'fixed';
+      onboardingDiv.style.top = '0';
+      onboardingDiv.style.left = '0';
+      onboardingDiv.style.width = '100%';
+      onboardingDiv.style.height = '100%';
+      onboardingDiv.style.background = 'rgba(255,255,255,0.97)';
+      onboardingDiv.style.zIndex = '9999';
+      onboardingDiv.style.display = 'flex';
+      onboardingDiv.style.flexDirection = 'column';
+      onboardingDiv.style.justifyContent = 'center';
+      onboardingDiv.style.alignItems = 'center';
+      onboardingDiv.innerHTML = `
+        <div style="max-width:320px;padding:24px 18px 18px 18px;border-radius:10px;box-shadow:0 2px 12px #0001;background:#fff;text-align:center;">
+          <h3 style="color:#1976d2;">👋 ${t('appName')}</h3>
+          <p style="font-size:15px;line-height:1.5;margin:10px 0 18px 0;">${t('onboardingWelcome') || 'This extension helps you automate daily actions on your favorite sites!'}<br><br>
+          <b>${t('startRecording') || 'Start recording'}</b> — ${t('onboardingRecord') || 'Record your actions on the site.'}<br>
+          <b>${t('playActions') || 'Play actions'}</b> — ${t('onboardingPlay') || 'Replay your scenario.'}<br>
+          <b>${t('autoRunAll') || 'Automatically run all scenarios'}</b> — ${t('onboardingAuto') || 'Enable daily automation.'}</p>
+          <button id="onboardingCloseBtn" style="margin-top:10px;padding:8px 24px;font-size:15px;background:#1976d2;color:#fff;border:none;border-radius:5px;">OK</button>
+        </div>
+      `;
+      document.body.appendChild(onboardingDiv);
+      document.getElementById('onboardingCloseBtn').onclick = () => {
+        onboardingDiv.remove();
+        chrome.storage.local.set({ onboardingShown: true });
+      };
+    }
+  });
