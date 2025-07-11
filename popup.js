@@ -148,7 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateScenarioList() {
     if (!scenarioList) return;
     scenarioList.innerHTML = '';
-    Object.keys(scenarios).forEach(domain => {
+    const domains = Object.keys(scenarios);
+    domains.forEach((domain, idx) => {
       if (!domain || domain === 'undefined') return;
       const scenario = scenarios[domain];
       const name = (scenario.name || domain);
@@ -162,6 +163,41 @@ document.addEventListener('DOMContentLoaded', () => {
         li.style.background = '#d0ebff';
         li.style.fontWeight = 'bold';
       }
+      // Drag&drop атрибуты
+      li.setAttribute('draggable', 'true');
+      li.dataset.domain = domain;
+      li.ondragstart = (e) => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', domain);
+        li.classList.add('dragging');
+      };
+      li.ondragend = () => {
+        li.classList.remove('dragging');
+        scenarioList.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      };
+      li.ondragover = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        li.classList.add('drag-over');
+      };
+      li.ondragleave = () => {
+        li.classList.remove('drag-over');
+      };
+      li.ondrop = (e) => {
+        e.preventDefault();
+        const fromDomain = e.dataTransfer.getData('text/plain');
+        const toDomain = domain;
+        if (fromDomain === toDomain) return;
+        // Переставляем сценарии в новом порядке
+        const newOrder = domains.filter(d => d !== fromDomain);
+        const toIdx = newOrder.indexOf(toDomain);
+        newOrder.splice(toIdx, 0, fromDomain);
+        // Пересобираем scenarios в новом порядке
+        const newScenarios = {};
+        newOrder.forEach(d => { newScenarios[d] = scenarios[d]; });
+        scenarios = newScenarios;
+        chrome.storage.local.set({ scenarios }, () => updateScenarioList());
+      };
       // Кнопка удаления сценария
       const delBtn = document.createElement('button');
       delBtn.innerHTML = '';
@@ -539,7 +575,8 @@ function setSelectScenario() { statusDiv.textContent = t('selectScenario'); }
 function updateScenarioList() {
   if (!scenarioList) return;
   scenarioList.innerHTML = '';
-  Object.keys(scenarios).forEach(domain => {
+  const domains = Object.keys(scenarios);
+  domains.forEach((domain, idx) => {
     if (!domain || domain === 'undefined') return;
     const scenario = scenarios[domain];
     const name = (scenario.name || domain);
@@ -553,6 +590,41 @@ function updateScenarioList() {
       li.style.background = '#d0ebff';
       li.style.fontWeight = 'bold';
     }
+    // Drag&drop атрибуты
+    li.setAttribute('draggable', 'true');
+    li.dataset.domain = domain;
+    li.ondragstart = (e) => {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', domain);
+      li.classList.add('dragging');
+    };
+    li.ondragend = () => {
+      li.classList.remove('dragging');
+      scenarioList.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    };
+    li.ondragover = (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      li.classList.add('drag-over');
+    };
+    li.ondragleave = () => {
+      li.classList.remove('drag-over');
+    };
+    li.ondrop = (e) => {
+      e.preventDefault();
+      const fromDomain = e.dataTransfer.getData('text/plain');
+      const toDomain = domain;
+      if (fromDomain === toDomain) return;
+      // Переставляем сценарии в новом порядке
+      const newOrder = domains.filter(d => d !== fromDomain);
+      const toIdx = newOrder.indexOf(toDomain);
+      newOrder.splice(toIdx, 0, fromDomain);
+      // Пересобираем scenarios в новом порядке
+      const newScenarios = {};
+      newOrder.forEach(d => { newScenarios[d] = scenarios[d]; });
+      scenarios = newScenarios;
+      chrome.storage.local.set({ scenarios }, () => updateScenarioList());
+    };
     // Кнопка удаления сценария
     const delBtn = document.createElement('button');
     delBtn.innerHTML = '';
