@@ -11,16 +11,20 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const { actions, domain, name, desc, url } = msg;
     chrome.storage.local.get('scenarios', data => {
       let scenarios = data.scenarios || {};
-      // Новый ключ — url (или origin+path)
       const key = url || domain;
-      // Собираем все сценарии для этого url
-      const existing = Object.values(scenarios).filter(s => s.url === url);
-      let scenarioName = name;
-      if (existing.length > 0) {
-        // Если уже есть сценарий для этого url, добавляем номер
-        scenarioName = `${name} [${existing.length + 1}]`;
+      if (!Array.isArray(scenarios[key])) scenarios[key] = [];
+      // Формируем базовое имя: domain+path
+      let baseName = name;
+      if (!baseName) {
+        try {
+          const parsed = new URL(url);
+          baseName = parsed.hostname + parsed.pathname;
+        } catch { baseName = domain; }
       }
-      scenarios[key] = { name: scenarioName, domain, url, actions, desc: desc || '' };
+      // Автоматически добавляем номер, если уже есть сценарии для этого URL
+      let scenarioName = baseName;
+      if (scenarios[key].length > 0) scenarioName += ` [${scenarios[key].length + 1}]`;
+      scenarios[key].push({ name: scenarioName, domain, url, actions, desc: desc || '' });
       chrome.storage.local.set({ scenarios }, () => {
         sendResponse({ status: 'saved' });
       });
@@ -32,13 +36,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     });
     return true;
   } else if (msg.type === 'RENAME_SCENARIO') {
-    const { domain, name, desc, url } = msg;
+    const { domain, name, desc, url, index } = msg;
     chrome.storage.local.get('scenarios', data => {
       let scenarios = data.scenarios || {};
       const key = url || domain;
-      if (scenarios[key]) {
-        scenarios[key].name = name;
-        if (typeof desc !== 'undefined') scenarios[key].desc = desc;
+      if (scenarios[key] && scenarios[key][index]) {
+        scenarios[key][index].name = name;
+        if (typeof desc !== 'undefined') scenarios[key][index].desc = desc;
         chrome.storage.local.set({ scenarios }, () => {
           sendResponse({ status: 'renamed' });
         });

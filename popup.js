@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let scenarios = {};
   let selectedDomain = '';
   let selectedName = '';
+  let selectedArr = null;
+  let selectedIndex = -1;
 
   // Вспомогательные DOM-элементы объявляются один раз
   let actionsDiv, scheduleDiv, scheduleInput, setScheduleBtn, exportBtn, importBtn, autoRunSwitchDiv, autoRunAllSwitch, searchDiv, searchInput;
@@ -155,26 +157,38 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateScenarioList() {
     if (!scenarioList) return;
     scenarioList.innerHTML = '';
-    // Показываем только сценарии для текущего домена
-    const filtered = Object.entries(scenarios).filter(([key, s]) => s.domain === currentDomain);
-    filtered.forEach(([key, scenario], idx) => {
-      const name = scenario.name || key;
-      if (scenarioFilter && !name.toLowerCase().includes(scenarioFilter)) return;
+    let allScenarios = [];
+    Object.entries(scenarios).forEach(([key, arr]) => {
+      if (Array.isArray(arr)) {
+        arr.forEach((scenario, idx) => {
+          allScenarios.push({ scenario, idx, arr, key });
+        });
+      }
+    });
+    if (allScenarios.length === 0) {
+      const li = document.createElement('li');
+      li.textContent = t('noActions');
+      li.style.color = '#888';
+      scenarioList.appendChild(li);
+      renderActionsList();
+      return;
+    }
+    allScenarios.forEach(({ scenario, idx, arr, key }) => {
+      const name = scenario.name || (scenario.domain + scenario.url);
       const li = document.createElement('li');
       li.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
       li.style.cursor = 'pointer';
       li.style.padding = '2px 4px';
       li.style.borderRadius = '4px';
-      if (key === selectedDomain) {
-        li.style.background = '#d0ebff';
-        li.style.fontWeight = 'bold';
+      // Выделение выбранного сценария
+      if (arr === selectedArr && idx === selectedIndex) {
+        li.classList.add('selected');
       }
-      // Drag&drop атрибуты
+      // Drag&drop
       li.setAttribute('draggable', 'true');
-      li.dataset.domain = key;
       li.ondragstart = (e) => {
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', key);
+        e.dataTransfer.setData('text/plain', idx);
         li.classList.add('dragging');
       };
       li.ondragend = () => {
@@ -191,20 +205,16 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       li.ondrop = (e) => {
         e.preventDefault();
-        const fromDomain = e.dataTransfer.getData('text/plain');
-        const toDomain = key;
-        if (fromDomain === toDomain) return;
-        // Переставляем сценарии в новом порядке
-        const newOrder = domains.filter(d => d !== fromDomain);
-        const toIdx = newOrder.indexOf(toDomain);
-        newOrder.splice(toIdx, 0, fromDomain);
-        // Пересобираем scenarios в новом порядке
-        const newScenarios = {};
-        newOrder.forEach(d => { newScenarios[d] = scenarios[d]; });
-        scenarios = newScenarios;
+        li.classList.remove('drag-over');
+        const fromIdx = Number(e.dataTransfer.getData('text/plain'));
+        const toIdx = idx;
+        if (fromIdx === toIdx || arr !== selectedArr) return;
+        // Переставляем сценарии внутри массива
+        const moved = arr.splice(fromIdx, 1)[0];
+        arr.splice(toIdx, 0, moved);
         chrome.storage.local.set({ scenarios }, () => updateScenarioList());
       };
-      // Кнопка удаления сценария
+      // Кнопка удаления
       const delBtn = document.createElement('button');
       delBtn.innerHTML = '';
       delBtn.appendChild(createIcon('delete'));
@@ -212,16 +222,15 @@ document.addEventListener('DOMContentLoaded', () => {
       delBtn.style.marginLeft = '8px';
       delBtn.onclick = (e) => {
         e.stopPropagation();
-        if (confirm(t('deleteScenario', { name }))) {
-          delete scenarios[key];
-          chrome.storage.local.set({ scenarios }, () => updateScenarioList());
-          if (selectedDomain === key) {
-            selectedDomain = '';
-            selectedName = '';
-            recordedActions = [];
-            playBtn.disabled = true;
+        arr.splice(idx, 1);
+        chrome.storage.local.set({ scenarios }, () => {
+          // Если удалили выбранный — сбросить выбор
+          if (arr === selectedArr && idx === selectedIndex) {
+            selectedArr = null;
+            selectedIndex = -1;
           }
-        }
+          updateScenarioList();
+        });
       };
       // Кнопка переименования
       const renameBtn = document.createElement('button');
@@ -231,16 +240,15 @@ document.addEventListener('DOMContentLoaded', () => {
       renameBtn.style.marginLeft = '4px';
       renameBtn.onclick = (e) => {
         e.stopPropagation();
-        const newName = prompt(t('renameScenarioPrompt'), scenario.name || key);
+        const newName = prompt(t('renameScenarioPrompt'), scenario.name);
         if (newName && newName !== scenario.name) {
-          chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: key, name: newName }, () => {
-            scenarios[key].name = newName;
+          chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: scenario.domain, name: newName, url: scenario.url, index: idx }, () => {
+            scenario.name = newName;
             updateScenarioList();
-            if (selectedDomain === key) selectedName = newName;
           });
         }
       };
-      // Кнопка/иконка для редактирования описания сценария
+      // Кнопка/иконка для редактирования описания
       const descBtn = document.createElement('button');
       descBtn.innerHTML = '';
       descBtn.appendChild(createIcon('description'));
@@ -252,20 +260,20 @@ document.addEventListener('DOMContentLoaded', () => {
         descTextarea.onblur = () => {
           const newDesc = descTextarea.value;
           if (newDesc !== scenario.desc) {
-            chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: key, name: scenario.name, desc: newDesc }, () => {
-              scenarios[key].desc = newDesc;
+            chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: scenario.domain, name: scenario.name, desc: newDesc, url: scenario.url, index: idx }, () => {
+              scenario.desc = newDesc;
               updateScenarioList();
             });
           }
         };
       };
       li.onclick = () => {
-        selectedDomain = key;
-        selectedName = scenario.name || key;
+        selectedArr = arr;
+        selectedIndex = idx;
         recordedActions = scenario.actions || [];
         playBtn.disabled = !recordedActions.length;
         updateScenarioList();
-        statusDiv.textContent = t('selectScenarioStatus', { name: selectedName, domain: selectedDomain, count: recordedActions.length });
+        statusDiv.textContent = t('selectScenarioStatus', { name: scenario.name, domain: scenario.domain, count: recordedActions.length });
         renderActionsList();
         showScenarioDesc(scenario.desc);
       };
@@ -278,14 +286,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   playBtn.onclick = () => {
-    if (!recordedActions.length) return;
-    if (!selectedDomain) {
+    if (!selectedArr || selectedIndex === -1 || !selectedArr[selectedIndex]) {
       setSelectScenario();
       return;
     }
-    if (!confirm(t('playActionsConfirm', { name: (selectedName || selectedDomain) }))) return;
+    const scenario = selectedArr[selectedIndex];
+    if (!scenario.actions || !scenario.actions.length) return;
+    if (!confirm(t('playActionsConfirm', { name: scenario.name }))) return;
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-      sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: recordedActions}, (resp, err) => {
+      sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: scenario.actions}, (resp, err) => {
         if (err) {
           statusDiv.textContent = t('errorOnPage') + '\n' + err;
           return;
@@ -603,26 +612,38 @@ function setSelectScenario() { statusDiv.textContent = t('selectScenario'); }
 function updateScenarioList() {
   if (!scenarioList) return;
   scenarioList.innerHTML = '';
-  // Показываем только сценарии для текущего домена
-  const filtered = Object.entries(scenarios).filter(([key, s]) => s.domain === currentDomain);
-  filtered.forEach(([key, scenario], idx) => {
-    const name = scenario.name || key;
-    if (scenarioFilter && !name.toLowerCase().includes(scenarioFilter)) return;
+  let allScenarios = [];
+  Object.entries(scenarios).forEach(([key, arr]) => {
+    if (Array.isArray(arr)) {
+      arr.forEach((scenario, idx) => {
+        allScenarios.push({ scenario, idx, arr, key });
+      });
+    }
+  });
+  if (allScenarios.length === 0) {
+    const li = document.createElement('li');
+    li.textContent = t('noActions');
+    li.style.color = '#888';
+    scenarioList.appendChild(li);
+    renderActionsList();
+    return;
+  }
+  allScenarios.forEach(({ scenario, idx, arr, key }) => {
+    const name = scenario.name || (scenario.domain + scenario.url);
     const li = document.createElement('li');
     li.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
     li.style.cursor = 'pointer';
     li.style.padding = '2px 4px';
     li.style.borderRadius = '4px';
-    if (key === selectedDomain) {
-      li.style.background = '#d0ebff';
-      li.style.fontWeight = 'bold';
+    // Выделение выбранного сценария
+    if (arr === selectedArr && idx === selectedIndex) {
+      li.classList.add('selected');
     }
-    // Drag&drop атрибуты
+    // Drag&drop
     li.setAttribute('draggable', 'true');
-    li.dataset.domain = key;
     li.ondragstart = (e) => {
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', key);
+      e.dataTransfer.setData('text/plain', idx);
       li.classList.add('dragging');
     };
     li.ondragend = () => {
@@ -639,20 +660,16 @@ function updateScenarioList() {
     };
     li.ondrop = (e) => {
       e.preventDefault();
-      const fromDomain = e.dataTransfer.getData('text/plain');
-      const toDomain = key;
-      if (fromDomain === toDomain) return;
-      // Переставляем сценарии в новом порядке
-      const newOrder = domains.filter(d => d !== fromDomain);
-      const toIdx = newOrder.indexOf(toDomain);
-      newOrder.splice(toIdx, 0, fromDomain);
-      // Пересобираем scenarios в новом порядке
-      const newScenarios = {};
-      newOrder.forEach(d => { newScenarios[d] = scenarios[d]; });
-      scenarios = newScenarios;
+      li.classList.remove('drag-over');
+      const fromIdx = Number(e.dataTransfer.getData('text/plain'));
+      const toIdx = idx;
+      if (fromIdx === toIdx || arr !== selectedArr) return;
+      // Переставляем сценарии внутри массива
+      const moved = arr.splice(fromIdx, 1)[0];
+      arr.splice(toIdx, 0, moved);
       chrome.storage.local.set({ scenarios }, () => updateScenarioList());
     };
-    // Кнопка удаления сценария
+    // Кнопка удаления
     const delBtn = document.createElement('button');
     delBtn.innerHTML = '';
     delBtn.appendChild(createIcon('delete'));
@@ -660,16 +677,15 @@ function updateScenarioList() {
     delBtn.style.marginLeft = '8px';
     delBtn.onclick = (e) => {
       e.stopPropagation();
-      if (confirm(t('deleteScenario', { name }))) {
-        delete scenarios[key];
-        chrome.storage.local.set({ scenarios }, () => updateScenarioList());
-        if (selectedDomain === key) {
-          selectedDomain = '';
-          selectedName = '';
-          recordedActions = [];
-          playBtn.disabled = true;
+      arr.splice(idx, 1);
+      chrome.storage.local.set({ scenarios }, () => {
+        // Если удалили выбранный — сбросить выбор
+        if (arr === selectedArr && idx === selectedIndex) {
+          selectedArr = null;
+          selectedIndex = -1;
         }
-      }
+        updateScenarioList();
+      });
     };
     // Кнопка переименования
     const renameBtn = document.createElement('button');
@@ -679,16 +695,15 @@ function updateScenarioList() {
     renameBtn.style.marginLeft = '4px';
     renameBtn.onclick = (e) => {
       e.stopPropagation();
-      const newName = prompt(t('renameScenarioPrompt'), scenario.name || key);
+      const newName = prompt(t('renameScenarioPrompt'), scenario.name);
       if (newName && newName !== scenario.name) {
-        chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: key, name: newName }, () => {
-          scenarios[key].name = newName;
+        chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: scenario.domain, name: newName, url: scenario.url, index: idx }, () => {
+          scenario.name = newName;
           updateScenarioList();
-          if (selectedDomain === key) selectedName = newName;
         });
       }
     };
-    // Кнопка/иконка для редактирования описания сценария
+    // Кнопка/иконка для редактирования описания
     const descBtn = document.createElement('button');
     descBtn.innerHTML = '';
     descBtn.appendChild(createIcon('description'));
@@ -700,20 +715,20 @@ function updateScenarioList() {
       descTextarea.onblur = () => {
         const newDesc = descTextarea.value;
         if (newDesc !== scenario.desc) {
-          chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: key, name: scenario.name, desc: newDesc }, () => {
-            scenarios[key].desc = newDesc;
+          chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: scenario.domain, name: scenario.name, desc: newDesc, url: scenario.url, index: idx }, () => {
+            scenario.desc = newDesc;
             updateScenarioList();
           });
         }
       };
     };
     li.onclick = () => {
-      selectedDomain = key;
-      selectedName = scenario.name || key;
+      selectedArr = arr;
+      selectedIndex = idx;
       recordedActions = scenario.actions || [];
       playBtn.disabled = !recordedActions.length;
       updateScenarioList();
-      statusDiv.textContent = t('selectScenarioStatus', { name: selectedName, domain: selectedDomain, count: recordedActions.length });
+      statusDiv.textContent = t('selectScenarioStatus', { name: scenario.name, domain: scenario.domain, count: recordedActions.length });
       renderActionsList();
       showScenarioDesc(scenario.desc);
     };
@@ -726,14 +741,15 @@ function updateScenarioList() {
 }
 
 playBtn.onclick = () => {
-  if (!recordedActions.length) return;
-  if (!selectedDomain) {
+  if (!selectedArr || selectedIndex === -1 || !selectedArr[selectedIndex]) {
     setSelectScenario();
     return;
   }
-  if (!confirm(t('playActionsConfirm', { name: (selectedName || selectedDomain) }))) return;
+  const scenario = selectedArr[selectedIndex];
+  if (!scenario.actions || !scenario.actions.length) return;
+  if (!confirm(t('playActionsConfirm', { name: scenario.name }))) return;
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-    sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: recordedActions}, (resp, err) => {
+    sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: scenario.actions}, (resp, err) => {
       if (err) {
         statusDiv.textContent = t('errorOnPage') + '\n' + err;
         return;

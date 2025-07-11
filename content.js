@@ -172,13 +172,27 @@ document.addEventListener('keydown', function(e) {
     isRecording = false;
     window.removeEventListener('click', handleClick, true);
     window.removeEventListener('input', handleInput, true);
-    // Отправляем сообщение в background для сохранения
-    chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: window.location.hostname, url: window.location.href}, () => {
-      if (typeof chrome !== 'undefined' && chrome.i18n) {
-        alert(chrome.i18n.getMessage('recordStoppedAlert'));
-      } else {
-        alert('Recording stopped (Ctrl+Shift+S).');
-      }
+    // Получаем все сценарии для подсчёта номера
+    chrome.storage.local.get('scenarios', data => {
+      const url = window.location.href;
+      const domain = window.location.hostname;
+      let scenarios = data.scenarios || {};
+      const key = url || domain;
+      const existing = (scenarios[key] || []);
+      let baseName = '';
+      try {
+        const parsed = new URL(url);
+        baseName = parsed.hostname + parsed.pathname;
+      } catch { baseName = domain; }
+      let name = baseName;
+      if (existing.length > 0) name += ` [${existing.length + 1}]`;
+      chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain, name, url}, () => {
+        if (typeof chrome !== 'undefined' && chrome.i18n) {
+          alert(chrome.i18n.getMessage('recordStoppedAlert'));
+        } else {
+          alert('Recording stopped (Ctrl+Shift+S).');
+        }
+      });
     });
   }
 });
