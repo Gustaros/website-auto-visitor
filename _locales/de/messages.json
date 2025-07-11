@@ -53,5 +53,8 @@
   },
   "autoRunSet": {
     "message": "Auto-Start: {time}"
-  }
+  },
+  "errorHttpOnly": { "message": "Die Erweiterung funktioniert nur auf regulären Seiten (http/https)." },
+  "errorDomainDetect": { "message": "Domain konnte nicht ermittelt werden." },
+  "current": { "message": "aktuell" }
 }

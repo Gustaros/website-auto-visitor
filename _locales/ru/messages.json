@@ -151,5 +151,14 @@
   },
   "autoRunSet": {
     "message": "Автозапуск: {time}"
+  },
+  "errorHttpOnly": {
+    "message": "Расширение работает только на обычных сайтах (http/https)."
+  },
+  "errorDomainDetect": {
+    "message": "Не удалось определить домен."
+  },
+  "current": {
+    "message": "текущий"
   }
 }

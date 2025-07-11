@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       url = tabs[0].url || '';
       if (!url.startsWith('http')) {
-        statusDiv.textContent = 'Расширение работает только на обычных сайтах (http/https).';
+        statusDiv.textContent = t('errorHttpOnly');
         startBtn.disabled = true;
         stopBtn.disabled = true;
         playBtn.disabled = true;
@@ -50,9 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       const parsed = new URL(url);
       currentDomain = parsed.hostname;
-      statusDiv.textContent = 'Домен: ' + currentDomain;
+      statusDiv.textContent = t('domain', {domain: currentDomain});
     } catch {
-      statusDiv.textContent = 'Не удалось определить домен.';
+      statusDiv.textContent = t('errorDomainDetect');
       startBtn.disabled = true;
       stopBtn.disabled = true;
       playBtn.disabled = true;
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = (scenario.name || domain);
       if (scenarioFilter && !name.toLowerCase().includes(scenarioFilter)) return;
       const li = document.createElement('li');
-      li.textContent = name + (domain === currentDomain ? ' (текущий)' : '');
+      li.textContent = name + (domain === currentDomain ? ' (' + t('current') + ')' : '');
       li.style.cursor = 'pointer';
       li.style.padding = '2px 4px';
       li.style.borderRadius = '4px';
@@ -585,7 +585,7 @@ function updateScenarioList() {
     const name = (scenario.name || domain);
     if (scenarioFilter && !name.toLowerCase().includes(scenarioFilter)) return;
     const li = document.createElement('li');
-    li.textContent = name + (domain === currentDomain ? ' (текущий)' : '');
+    li.textContent = name + (domain === currentDomain ? ' (' + t('current') + ')' : '');
     li.style.cursor = 'pointer';
     li.style.padding = '2px 4px';
     li.style.borderRadius = '4px';

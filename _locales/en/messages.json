@@ -151,5 +151,14 @@
   },
   "autoRunSet": {
     "message": "Auto-run: {time}"
+  },
+  "errorHttpOnly": {
+    "message": "Extension works only on regular sites (http/https)."
+  },
+  "errorDomainDetect": {
+    "message": "Could not determine domain."
+  },
+  "current": {
+    "message": "current"
   }
 }

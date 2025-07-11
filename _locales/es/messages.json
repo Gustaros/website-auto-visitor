@@ -53,5 +53,8 @@
   },
   "autoRunSet": {
     "message": "Auto-ejecución: {time}"
-  }
+  },
+  "errorHttpOnly": { "message": "La extensión solo funciona en sitios normales (http/https)." },
+  "errorDomainDetect": { "message": "No se pudo determinar el dominio." },
+  "current": { "message": "actual" }
 }
