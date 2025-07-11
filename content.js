@@ -101,7 +101,7 @@ async function playActions(actions) {
     }
     if (action.type === 'link') {
       window.location.href = action.href;
-      return; // дальнейшие действия будут невозможны после перехода
+      return;
     }
     let el = null;
     try {
@@ -112,20 +112,24 @@ async function playActions(actions) {
     }
     if (!el) continue;
     if (action.type === 'click') {
-      if (typeof el.click === 'function') {
-        el.click();
-      } else {
-        console.warn('Element does not support click():', el, action.selector);
+      // Имитация полного клика для UI-фреймворков
+      ['mousedown','mouseup','click'].forEach(evt => {
+        el.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+      });
+      // Для checkbox/toggle дополнительно генерируем change
+      if (el.type === 'checkbox' || el.getAttribute('role') === 'switch' || el.type === 'radio') {
+        el.dispatchEvent(new Event('change', { bubbles: true }));
       }
     } else if (action.type === 'input') {
       if ('value' in el && typeof el.dispatchEvent === 'function') {
         el.value = action.value;
         el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
       } else {
         console.warn('Element does not support input:', el, action.selector);
       }
     }
-    await new Promise(r => setTimeout(r, 500)); // задержка между действиями
+    await new Promise(r => setTimeout(r, 500));
   }
 }
 
@@ -134,10 +138,15 @@ function getUniqueSelector(el) {
   if (el.id && /^[A-Za-z0-9_-]+$/.test(el.id)) return `#${cssEscape(el.id)}`;
   let path = [];
   let current = el;
-  while (current && current.nodeType === 1 && path.length < 5) {
+  while (current && current.nodeType === 1 && path.length < 6) {
     let selector = current.nodeName.toLowerCase();
-    // Берём только первый валидный класс (без : и /)
-    if (current.classList && current.classList.length > 0) {
+    // Добавляем data-testid или data-qa, если есть
+    if (current.hasAttribute('data-testid')) {
+      selector += `[data-testid='${cssEscape(current.getAttribute('data-testid'))}']`;
+    } else if (current.hasAttribute('data-qa')) {
+      selector += `[data-qa='${cssEscape(current.getAttribute('data-qa'))}']`;
+    } else if (current.classList && current.classList.length > 0) {
+      // Берём только первый валидный класс
       const validClass = Array.from(current.classList).find(c => /^[A-Za-z0-9_-]+$/.test(c));
       if (validClass) selector += '.' + cssEscape(validClass);
     }
@@ -146,14 +155,27 @@ function getUniqueSelector(el) {
       const href = current.getAttribute('href');
       if (/^[^\s'"<>]+$/.test(href)) selector += `[href='${cssEscape(href)}']`;
     }
+    // Добавляем индекс среди однотипных siblings
+    if (current.parentElement) {
+      const siblings = Array.from(current.parentElement.children).filter(e => e.nodeName === current.nodeName);
+      if (siblings.length > 1) {
+        const idx = siblings.indexOf(current) + 1;
+        selector += `:nth-of-type(${idx})`;
+      }
+    }
     path.unshift(selector);
     current = current.parentElement;
   }
   const result = path.join(' > ');
   // Проверяем валидность селектора
   try {
-    document.querySelector(result);
-    return result;
+    const found = document.querySelectorAll(result);
+    if (found.length === 1) return result;
+    // Если не уникально — fallback на старый способ
+    if (el.id && /^[A-Za-z0-9_-]+$/.test(el.id)) return `#${cssEscape(el.id)}`;
+    // Если всё равно не уникально — alert
+    alert('Failed to record action: element selector is not unique.');
+    return null;
   } catch {
     alert('Failed to record action: element has too complex selector.');
     return null;
