@@ -166,5 +166,14 @@
   },
   "playActionsConfirm": {
     "message": "Play actions: {name}?"
+  },
+  "clearAllScenarios": {
+    "message": "Clear all scenarios"
+  },
+  "clearAllConfirm": {
+    "message": "Are you sure you want to delete all scenarios? This cannot be undone."
+  },
+  "clearAllDone": {
+    "message": "All scenarios have been deleted."
   }
 }

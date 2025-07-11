@@ -166,5 +166,14 @@
   },
   "playActionsConfirm": {
     "message": "Воспроизвести: {name}?"
+  },
+  "clearAllScenarios": {
+    "message": "Удалить все сценарии"
+  },
+  "clearAllConfirm": {
+    "message": "Вы уверены, что хотите удалить все сценарии? Это действие необратимо."
+  },
+  "clearAllDone": {
+    "message": "Все сценарии удалены."
   }
 }

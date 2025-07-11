@@ -58,5 +58,8 @@
   "errorDomainDetect": { "message": "无法确定域名。" },
   "current": { "message": "当前" },
   "selectScenarioStatus": { "message": "已选择: {name} ({domain})。{count, plural, one{1 个操作} other{{count} 个操作}}。" },
-  "playActionsConfirm": { "message": "播放操作: {name}?" }
+  "playActionsConfirm": { "message": "播放操作: {name}?" },
+  "clearAllScenarios": { "message": "清除所有场景" },
+  "clearAllConfirm": { "message": "您确定要删除所有场景吗？此操作无法撤销。" },
+  "clearAllDone": { "message": "所有场景已被删除。" }
 }

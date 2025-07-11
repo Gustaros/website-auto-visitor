@@ -821,6 +821,28 @@ autoRunAllSwitch.onchange = () => {
   chrome.storage.local.set({ autoRunAllEnabled: autoRunAllSwitch.checked });
 };
 
+// --- Clear all scenarios button ---
+let clearAllBtn = document.getElementById('clearAllBtn');
+if (!clearAllBtn) {
+  clearAllBtn = document.createElement('button');
+  clearAllBtn.id = 'clearAllBtn';
+  clearAllBtn.textContent = t('clearAllScenarios');
+  clearAllBtn.style.margin = '10px 0 0 0';
+  clearAllBtn.style.background = '#e57373';
+  clearAllBtn.style.color = '#fff';
+  clearAllBtn.style.fontWeight = 'bold';
+  clearAllBtn.onclick = () => {
+    if (confirm(t('clearAllConfirm'))) {
+      chrome.storage.local.set({ scenarios: {} }, () => {
+        scenarios = {};
+        updateScenarioList();
+        statusDiv.textContent = t('clearAllDone');
+      });
+    }
+  };
+  document.body.appendChild(clearAllBtn);
+}
+
 // Пошаговый интерактивный onboarding (примерная реализация)
 function runOnboarding() {
   const steps = [

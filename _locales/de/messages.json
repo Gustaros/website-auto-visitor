@@ -58,5 +58,8 @@
   "errorDomainDetect": { "message": "Domain konnte nicht ermittelt werden." },
   "current": { "message": "aktuell" },
   "selectScenarioStatus": { "message": "Ausgewählt: {name} ({domain}). {count, plural, one{1 Aktion} other{{count} Aktionen}}." },
-  "playActionsConfirm": { "message": "Aktionen abspielen: {name}?" }
+  "playActionsConfirm": { "message": "Aktionen abspielen: {name}?" },
+  "clearAllScenarios": { "message": "Alle Szenarien löschen" },
+  "clearAllConfirm": { "message": "Möchten Sie wirklich alle Szenarien löschen? Dies kann nicht rückgängig gemacht werden." },
+  "clearAllDone": { "message": "Alle Szenarien wurden gelöscht." }
 }

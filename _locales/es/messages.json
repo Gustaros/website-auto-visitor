@@ -58,5 +58,8 @@
   "errorDomainDetect": { "message": "No se pudo determinar el dominio." },
   "current": { "message": "actual" },
   "selectScenarioStatus": { "message": "Seleccionado: {name} ({domain}). {count, plural, one{1 acción} other{{count} acciones}}." },
-  "playActionsConfirm": { "message": "Reproducir acciones: {name}?" }
+  "playActionsConfirm": { "message": "Reproducir acciones: {name}?" },
+  "clearAllScenarios": { "message": "Eliminar todos los escenarios" },
+  "clearAllConfirm": { "message": "¿Está seguro de que desea eliminar todos los escenarios? Esto no se puede deshacer." },
+  "clearAllDone": { "message": "Todos los escenarios han sido eliminados." }
 }

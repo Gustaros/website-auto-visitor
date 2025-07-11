@@ -54,5 +54,8 @@
   "errorDomainDetect": { "message": "Impossible de déterminer le domaine." },
   "current": { "message": "actuel" },
   "selectScenarioStatus": { "message": "Sélectionné : {name} ({domain}). {count, plural, one{1 action} other{{count} actions}}." },
-  "playActionsConfirm": { "message": "Lire les actions : {name} ?" }
+  "playActionsConfirm": { "message": "Lire les actions : {name} ?" },
+  "clearAllScenarios": { "message": "Supprimer tous les scénarios" },
+  "clearAllConfirm": { "message": "Êtes-vous sûr de vouloir supprimer tous les scénarios ? Cette action est irréversible." },
+  "clearAllDone": { "message": "Tous les scénarios ont été supprimés." }
 }
