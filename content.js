@@ -1,5 +1,5 @@
 // Контент-скрипт для записи и воспроизведения действий пользователя
-console.log('[Website Auto Visitor] content.js загружен на', window.location.href);
+console.log('[Website Auto Visitor] content.js loaded on', window.location.href);
 
 // Глобальные переменные для хранения состояния записи и списка действий
 let isRecording = false;
@@ -107,7 +107,7 @@ async function playActions(actions) {
     try {
       el = document.querySelector(action.selector);
     } catch (e) {
-      console.warn('Некорректный селектор:', action.selector, e);
+      console.warn('Invalid selector:', action.selector, e);
       continue;
     }
     if (!el) continue;
@@ -115,14 +115,14 @@ async function playActions(actions) {
       if (typeof el.click === 'function') {
         el.click();
       } else {
-        console.warn('Элемент не поддерживает click():', el, action.selector);
+        console.warn('Element does not support click():', el, action.selector);
       }
     } else if (action.type === 'input') {
       if ('value' in el && typeof el.dispatchEvent === 'function') {
         el.value = action.value;
         el.dispatchEvent(new Event('input', { bubbles: true }));
       } else {
-        console.warn('Элемент не поддерживает ввод:', el, action.selector);
+        console.warn('Element does not support input:', el, action.selector);
       }
     }
     await new Promise(r => setTimeout(r, 500)); // задержка между действиями
@@ -155,7 +155,7 @@ function getUniqueSelector(el) {
     document.querySelector(result);
     return result;
   } catch {
-    alert('Не удалось записать действие: элемент имеет слишком сложный селектор.');
+    alert('Failed to record action: element has too complex selector.');
     return null;
   }
 }
