@@ -173,7 +173,7 @@ document.addEventListener('keydown', function(e) {
     window.removeEventListener('click', handleClick, true);
     window.removeEventListener('input', handleInput, true);
     // Отправляем сообщение в background для сохранения
-    chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: window.location.hostname}, () => {
+    chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: window.location.hostname, url: window.location.href}, () => {
       if (typeof chrome !== 'undefined' && chrome.i18n) {
         alert(chrome.i18n.getMessage('recordStoppedAlert'));
       } else {

@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let recordedActions = [];
   let currentDomain = '';
+  let currentUrl = '';
   let scenarios = {};
   let selectedDomain = '';
   let selectedName = '';
@@ -50,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       const parsed = new URL(url);
       currentDomain = parsed.hostname;
+      currentUrl = url;
       statusDiv.textContent = t('domain', {domain: currentDomain});
     } catch {
       statusDiv.textContent = t('errorDomainDetect');
@@ -61,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Загружаем сценарии
     chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
       scenarios = resp.scenarios || {};
-      console.log('[Website Auto Visitor] Loaded scenarios:', scenarios); // diagnostics
       updateScenarioList();
     });
   });
@@ -116,10 +117,16 @@ document.addEventListener('DOMContentLoaded', () => {
         stopBtn.disabled = true;
         playBtn.disabled = recordedActions.length === 0;
         if (currentDomain) {
-          const name = prompt(t('newScenarioName'), currentDomain) || currentDomain;
+          // Формируем имя сценария: domain + path + номер
+          const parsed = new URL(currentUrl);
+          let baseName = parsed.hostname + parsed.pathname;
+          // Считаем сколько уже сценариев для этого url
+          const existing = Object.values(scenarios).filter(s => s.url === currentUrl);
+          let name = baseName;
+          if (existing.length > 0) name += ` [${existing.length + 1}]`;
           let desc = '';
           if (descTextarea) desc = descTextarea.value;
-          chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: currentDomain, name, desc}, () => {
+          chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: currentDomain, name, desc, url: currentUrl}, () => {
             chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
               scenarios = resp.scenarios || {};
               updateScenarioList();
@@ -148,27 +155,26 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateScenarioList() {
     if (!scenarioList) return;
     scenarioList.innerHTML = '';
-    const domains = Object.keys(scenarios);
-    domains.forEach((domain, idx) => {
-      if (!domain || domain === 'undefined') return;
-      const scenario = scenarios[domain];
-      const name = (scenario.name || domain);
+    // Показываем только сценарии для текущего домена
+    const filtered = Object.entries(scenarios).filter(([key, s]) => s.domain === currentDomain);
+    filtered.forEach(([key, scenario], idx) => {
+      const name = scenario.name || key;
       if (scenarioFilter && !name.toLowerCase().includes(scenarioFilter)) return;
       const li = document.createElement('li');
-      li.textContent = name + (domain === currentDomain ? ' (' + t('current') + ')' : '');
+      li.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
       li.style.cursor = 'pointer';
       li.style.padding = '2px 4px';
       li.style.borderRadius = '4px';
-      if (domain === selectedDomain) {
+      if (key === selectedDomain) {
         li.style.background = '#d0ebff';
         li.style.fontWeight = 'bold';
       }
       // Drag&drop атрибуты
       li.setAttribute('draggable', 'true');
-      li.dataset.domain = domain;
+      li.dataset.domain = key;
       li.ondragstart = (e) => {
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', domain);
+        e.dataTransfer.setData('text/plain', key);
         li.classList.add('dragging');
       };
       li.ondragend = () => {
@@ -186,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
       li.ondrop = (e) => {
         e.preventDefault();
         const fromDomain = e.dataTransfer.getData('text/plain');
-        const toDomain = domain;
+        const toDomain = key;
         if (fromDomain === toDomain) return;
         // Переставляем сценарии в новом порядке
         const newOrder = domains.filter(d => d !== fromDomain);
@@ -207,9 +213,9 @@ document.addEventListener('DOMContentLoaded', () => {
       delBtn.onclick = (e) => {
         e.stopPropagation();
         if (confirm(t('deleteScenario', { name }))) {
-          delete scenarios[domain];
+          delete scenarios[key];
           chrome.storage.local.set({ scenarios }, () => updateScenarioList());
-          if (selectedDomain === domain) {
+          if (selectedDomain === key) {
             selectedDomain = '';
             selectedName = '';
             recordedActions = [];
@@ -225,12 +231,12 @@ document.addEventListener('DOMContentLoaded', () => {
       renameBtn.style.marginLeft = '4px';
       renameBtn.onclick = (e) => {
         e.stopPropagation();
-        const newName = prompt(t('renameScenarioPrompt'), scenario.name || domain);
+        const newName = prompt(t('renameScenarioPrompt'), scenario.name || key);
         if (newName && newName !== scenario.name) {
-          chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain, name: newName }, () => {
-            scenarios[domain].name = newName;
+          chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: key, name: newName }, () => {
+            scenarios[key].name = newName;
             updateScenarioList();
-            if (selectedDomain === domain) selectedName = newName;
+            if (selectedDomain === key) selectedName = newName;
           });
         }
       };
@@ -246,20 +252,20 @@ document.addEventListener('DOMContentLoaded', () => {
         descTextarea.onblur = () => {
           const newDesc = descTextarea.value;
           if (newDesc !== scenario.desc) {
-            chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain, name: scenario.name, desc: newDesc }, () => {
-              scenarios[domain].desc = newDesc;
+            chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: key, name: scenario.name, desc: newDesc }, () => {
+              scenarios[key].desc = newDesc;
               updateScenarioList();
             });
           }
         };
       };
       li.onclick = () => {
-        selectedDomain = domain;
-        selectedName = scenario.name || domain;
+        selectedDomain = key;
+        selectedName = scenario.name || key;
         recordedActions = scenario.actions || [];
         playBtn.disabled = !recordedActions.length;
         updateScenarioList();
-        statusDiv.textContent = t('selectScenarioStatus', { name: selectedName, domain, count: recordedActions.length });
+        statusDiv.textContent = t('selectScenarioStatus', { name: selectedName, domain: selectedDomain, count: recordedActions.length });
         renderActionsList();
         showScenarioDesc(scenario.desc);
       };
@@ -597,27 +603,26 @@ function setSelectScenario() { statusDiv.textContent = t('selectScenario'); }
 function updateScenarioList() {
   if (!scenarioList) return;
   scenarioList.innerHTML = '';
-  const domains = Object.keys(scenarios);
-  domains.forEach((domain, idx) => {
-    if (!domain || domain === 'undefined') return;
-    const scenario = scenarios[domain];
-    const name = (scenario.name || domain);
+  // Показываем только сценарии для текущего домена
+  const filtered = Object.entries(scenarios).filter(([key, s]) => s.domain === currentDomain);
+  filtered.forEach(([key, scenario], idx) => {
+    const name = scenario.name || key;
     if (scenarioFilter && !name.toLowerCase().includes(scenarioFilter)) return;
     const li = document.createElement('li');
-    li.textContent = name + (domain === currentDomain ? ' (' + t('current') + ')' : '');
+    li.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
     li.style.cursor = 'pointer';
     li.style.padding = '2px 4px';
     li.style.borderRadius = '4px';
-    if (domain === selectedDomain) {
+    if (key === selectedDomain) {
       li.style.background = '#d0ebff';
       li.style.fontWeight = 'bold';
     }
     // Drag&drop атрибуты
     li.setAttribute('draggable', 'true');
-    li.dataset.domain = domain;
+    li.dataset.domain = key;
     li.ondragstart = (e) => {
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', domain);
+      e.dataTransfer.setData('text/plain', key);
       li.classList.add('dragging');
     };
     li.ondragend = () => {
@@ -635,7 +640,7 @@ function updateScenarioList() {
     li.ondrop = (e) => {
       e.preventDefault();
       const fromDomain = e.dataTransfer.getData('text/plain');
-      const toDomain = domain;
+      const toDomain = key;
       if (fromDomain === toDomain) return;
       // Переставляем сценарии в новом порядке
       const newOrder = domains.filter(d => d !== fromDomain);
@@ -656,9 +661,9 @@ function updateScenarioList() {
     delBtn.onclick = (e) => {
       e.stopPropagation();
       if (confirm(t('deleteScenario', { name }))) {
-        delete scenarios[domain];
+        delete scenarios[key];
         chrome.storage.local.set({ scenarios }, () => updateScenarioList());
-        if (selectedDomain === domain) {
+        if (selectedDomain === key) {
           selectedDomain = '';
           selectedName = '';
           recordedActions = [];
@@ -674,12 +679,12 @@ function updateScenarioList() {
     renameBtn.style.marginLeft = '4px';
     renameBtn.onclick = (e) => {
       e.stopPropagation();
-      const newName = prompt(t('renameScenarioPrompt'), scenario.name || domain);
+      const newName = prompt(t('renameScenarioPrompt'), scenario.name || key);
       if (newName && newName !== scenario.name) {
-        chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain, name: newName }, () => {
-          scenarios[domain].name = newName;
+        chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: key, name: newName }, () => {
+          scenarios[key].name = newName;
           updateScenarioList();
-          if (selectedDomain === domain) selectedName = newName;
+          if (selectedDomain === key) selectedName = newName;
         });
       }
     };
@@ -695,20 +700,20 @@ function updateScenarioList() {
       descTextarea.onblur = () => {
         const newDesc = descTextarea.value;
         if (newDesc !== scenario.desc) {
-          chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain, name: scenario.name, desc: newDesc }, () => {
-            scenarios[domain].desc = newDesc;
+          chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: key, name: scenario.name, desc: newDesc }, () => {
+            scenarios[key].desc = newDesc;
             updateScenarioList();
           });
         }
       };
     };
     li.onclick = () => {
-      selectedDomain = domain;
-      selectedName = scenario.name || domain;
+      selectedDomain = key;
+      selectedName = scenario.name || key;
       recordedActions = scenario.actions || [];
       playBtn.disabled = !recordedActions.length;
       updateScenarioList();
-      statusDiv.textContent = t('selectScenarioStatus', { name: selectedName, domain, count: recordedActions.length });
+      statusDiv.textContent = t('selectScenarioStatus', { name: selectedName, domain: selectedDomain, count: recordedActions.length });
       renderActionsList();
       showScenarioDesc(scenario.desc);
     };
