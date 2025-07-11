@@ -47,5 +47,11 @@
   "tooltipImport": { "message": "Importer des scénarios depuis un fichier" },
   "tooltipAutoRun": { "message": "Exécuter automatiquement tous les scénarios au démarrage du navigateur" },
   "tooltipSchedule": { "message": "Définir un planning pour ce scénario" },
-  "tooltipDesc": { "message": "Ajouter ou modifier la description du scénario" }
+  "tooltipDesc": { "message": "Ajouter ou modifier la description du scénario" },
+  "scheduleSet": {
+    "message": "Planification pour {domain} définie à {time}."
+  },
+  "autoRunSet": {
+    "message": "Démarrage auto : {time}"
+  }
 }

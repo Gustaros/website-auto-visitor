@@ -145,5 +145,11 @@
   },
   "tooltipDesc": {
     "message": "Add or edit scenario description"
+  },
+  "scheduleSet": {
+    "message": "Schedule for {domain} set to {time}."
+  },
+  "autoRunSet": {
+    "message": "Auto-run: {time}"
   }
 }

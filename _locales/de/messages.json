@@ -47,5 +47,11 @@
   "tooltipImport": { "message": "Szenarien aus Datei importieren" },
   "tooltipAutoRun": { "message": "Alle Szenarien beim Browserstart automatisch ausführen" },
   "tooltipSchedule": { "message": "Zeitplan für dieses Szenario festlegen" },
-  "tooltipDesc": { "message": "Beschreibung für das Szenario hinzufügen oder bearbeiten" }
+  "tooltipDesc": { "message": "Beschreibung für das Szenario hinzufügen oder bearbeiten" },
+  "scheduleSet": {
+    "message": "Zeitplan für {domain} auf {time} gesetzt."
+  },
+  "autoRunSet": {
+    "message": "Auto-Start: {time}"
+  }
 }

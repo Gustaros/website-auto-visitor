@@ -145,5 +145,11 @@
   },
   "tooltipDesc": {
     "message": "Добавить или изменить описание сценария"
+  },
+  "scheduleSet": {
+    "message": "Автозапуск для {domain} установлен на {time}."
+  },
+  "autoRunSet": {
+    "message": "Автозапуск: {time}"
   }
 }

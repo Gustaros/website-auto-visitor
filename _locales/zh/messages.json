@@ -47,5 +47,11 @@
   "tooltipImport": { "message": "从文件导入场景" },
   "tooltipAutoRun": { "message": "浏览器启动时自动运行所有场景" },
   "tooltipSchedule": { "message": "为此场景设置计划" },
-  "tooltipDesc": { "message": "添加或编辑场景描述" }
+  "tooltipDesc": { "message": "添加或编辑场景描述" },
+  "scheduleSet": {
+    "message": "{domain} 的计划已设置为 {time}。"
+  },
+  "autoRunSet": {
+    "message": "自动运行：{time}"
+  }
 }

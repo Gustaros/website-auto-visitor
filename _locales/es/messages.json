@@ -47,5 +47,11 @@
   "tooltipImport": { "message": "Importar escenarios desde archivo" },
   "tooltipAutoRun": { "message": "Ejecutar automáticamente todos los escenarios al iniciar el navegador" },
   "tooltipSchedule": { "message": "Configurar horario para este escenario" },
-  "tooltipDesc": { "message": "Agregar o editar la descripción del escenario" }
+  "tooltipDesc": { "message": "Agregar o editar la descripción del escenario" },
+  "scheduleSet": {
+    "message": "Horario para {domain} establecido en {time}."
+  },
+  "autoRunSet": {
+    "message": "Auto-ejecución: {time}"
+  }
 }

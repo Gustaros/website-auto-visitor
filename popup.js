@@ -898,3 +898,5 @@ function createIcon(name) {
   i.textContent = name;
   return i;
 }
+
+// Add new localization keys for scheduleSet and autoRunSet if not present in locales
