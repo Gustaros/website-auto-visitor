@@ -564,6 +564,25 @@ document.addEventListener('DOMContentLoaded', () => {
   if (importBtn) importBtn.title = t('tooltipImport');
   if (autoRunAllSwitch) autoRunAllSwitch.title = t('tooltipAutoRun');
   if (setScheduleBtn) setScheduleBtn.title = t('tooltipSchedule');
+  // --- Clear all scenarios button ---
+  const clearAllBtn = document.getElementById('clearAllBtn');
+  if (clearAllBtn) {
+    clearAllBtn.textContent = t('clearAllScenarios');
+    clearAllBtn.disabled = false;
+    clearAllBtn.style.margin = '10px 0 0 0';
+    clearAllBtn.style.background = '#e57373';
+    clearAllBtn.style.color = '#fff';
+    clearAllBtn.style.fontWeight = 'bold';
+    clearAllBtn.onclick = () => {
+      if (confirm(t('clearAllConfirm'))) {
+        chrome.storage.local.set({ scenarios: {} }, () => {
+          scenarios = {};
+          updateScenarioList();
+          statusDiv.textContent = t('clearAllDone');
+        });
+      }
+    };
+  }
 });
 
 // Локализация статусов и сообщений
