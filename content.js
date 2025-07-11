@@ -54,6 +54,13 @@ function handleClick(e) {
       href: clickable.href,
       timestamp: Date.now()
     });
+  } else if (clickable.type === 'checkbox' || clickable.getAttribute('role') === 'switch' || clickable.type === 'radio') {
+    recordedActions.push({
+      type: 'click',
+      selector,
+      checked: clickable.checked,
+      timestamp: Date.now()
+    });
   } else {
     recordedActions.push({
       type: 'click',
@@ -112,13 +119,29 @@ async function playActions(actions) {
     }
     if (!el) continue;
     if (action.type === 'click') {
-      // Имитация полного клика для UI-фреймворков
-      ['mousedown','mouseup','click'].forEach(evt => {
-        el.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
-      });
-      // Для checkbox/toggle дополнительно генерируем change
-      if (el.type === 'checkbox' || el.getAttribute('role') === 'switch' || el.type === 'radio') {
+      if ((el.type === 'checkbox' || el.getAttribute('role') === 'switch' || el.type === 'radio') && typeof action.checked !== 'undefined') {
+        el.focus();
+        el.checked = action.checked;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
         el.dispatchEvent(new Event('change', { bubbles: true }));
+        await new Promise(r => setTimeout(r, 100));
+        if (typeof el.click === 'function') el.click();
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+        ['mousedown','mouseup','click'].forEach(evt => {
+          el.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+        });
+        await new Promise(r => setTimeout(r, 100));
+        el.blur();
+      } else {
+        // Обычный клик
+        ['mousedown','mouseup','click'].forEach(evt => {
+          el.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+        });
+        // Для других элементов с onChange/onInput
+        if (el.type === 'button' || el.type === 'submit') {
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        }
       }
     } else if (action.type === 'input') {
       if ('value' in el && typeof el.dispatchEvent === 'function') {
