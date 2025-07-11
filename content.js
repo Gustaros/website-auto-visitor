@@ -24,15 +24,34 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
+function findClickableAncestor(el) {
+  while (el && el !== document.body) {
+    if (
+      el.tagName === 'BUTTON' ||
+      el.tagName === 'A' ||
+      (el.tagName === 'INPUT' && ['button','submit','reset'].includes((el.type||'').toLowerCase())) ||
+      el.getAttribute('role') === 'button' ||
+      el.tabIndex >= 0
+    ) {
+      return el;
+    }
+    el = el.parentElement;
+  }
+  return null;
+}
+
 function handleClick(e) {
   if (!isRecording) return;
-  const selector = getUniqueSelector(e.target);
-  // Если клик по ссылке (a[href]) — записываем как переход
-  if (e.target.tagName === 'A' && e.target.href) {
+  let target = e.target;
+  // Если клик по SVG/path/иконке — ищем ближайший кликaбельный родитель
+  const clickable = findClickableAncestor(target) || target;
+  const selector = getUniqueSelector(clickable);
+  if (!selector) return;
+  if (clickable.tagName === 'A' && clickable.href) {
     recordedActions.push({
       type: 'link',
       selector,
-      href: e.target.href,
+      href: clickable.href,
       timestamp: Date.now()
     });
   } else {
@@ -47,6 +66,7 @@ function handleClick(e) {
 function handleInput(e) {
   if (!isRecording) return;
   const selector = getUniqueSelector(e.target);
+  if (!selector) return;
   recordedActions.push({
     type: 'input',
     selector,
@@ -59,8 +79,9 @@ function handleInput(e) {
 let lastScrollTop = window.scrollY;
 window.addEventListener('scroll', function() {
   if (!isRecording) return;
+  // scroll не требует селектора
   const scrollTop = window.scrollY;
-  if (Math.abs(scrollTop - lastScrollTop) > 10) { // фиксируем только значимые прокрутки
+  if (Math.abs(scrollTop - lastScrollTop) > 10) {
     recordedActions.push({
       type: 'scroll',
       scrollTop,
@@ -82,13 +103,27 @@ async function playActions(actions) {
       window.location.href = action.href;
       return; // дальнейшие действия будут невозможны после перехода
     }
-    const el = document.querySelector(action.selector);
+    let el = null;
+    try {
+      el = document.querySelector(action.selector);
+    } catch (e) {
+      console.warn('Некорректный селектор:', action.selector, e);
+      continue;
+    }
     if (!el) continue;
     if (action.type === 'click') {
-      el.click();
+      if (typeof el.click === 'function') {
+        el.click();
+      } else {
+        console.warn('Элемент не поддерживает click():', el, action.selector);
+      }
     } else if (action.type === 'input') {
-      el.value = action.value;
-      el.dispatchEvent(new Event('input', { bubbles: true }));
+      if ('value' in el && typeof el.dispatchEvent === 'function') {
+        el.value = action.value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      } else {
+        console.warn('Элемент не поддерживает ввод:', el, action.selector);
+      }
     }
     await new Promise(r => setTimeout(r, 500)); // задержка между действиями
   }
@@ -96,17 +131,39 @@ async function playActions(actions) {
 
 // Генерация уникального CSS-селектора для элемента
 function getUniqueSelector(el) {
-  if (el.id) return `#${el.id}`;
+  if (el.id && /^[A-Za-z0-9_-]+$/.test(el.id)) return `#${cssEscape(el.id)}`;
   let path = [];
-  while (el && el.nodeType === 1 && path.length < 5) {
-    let selector = el.nodeName.toLowerCase();
-    if (el.className) selector += '.' + Array.from(el.classList).join('.');
-    // Для ссылок добавляем [href] для надёжности
-    if (el.tagName === 'A' && el.getAttribute('href')) selector += `[href='${el.getAttribute('href')}']`;
+  let current = el;
+  while (current && current.nodeType === 1 && path.length < 5) {
+    let selector = current.nodeName.toLowerCase();
+    // Берём только первый валидный класс (без : и /)
+    if (current.classList && current.classList.length > 0) {
+      const validClass = Array.from(current.classList).find(c => /^[A-Za-z0-9_-]+$/.test(c));
+      if (validClass) selector += '.' + cssEscape(validClass);
+    }
+    // Для ссылок добавляем [href] если оно простое
+    if (current.tagName === 'A' && current.getAttribute('href')) {
+      const href = current.getAttribute('href');
+      if (/^[^\s'"<>]+$/.test(href)) selector += `[href='${cssEscape(href)}']`;
+    }
     path.unshift(selector);
-    el = el.parentElement;
+    current = current.parentElement;
   }
-  return path.join(' > ');
+  const result = path.join(' > ');
+  // Проверяем валидность селектора
+  try {
+    document.querySelector(result);
+    return result;
+  } catch {
+    alert('Не удалось записать действие: элемент имеет слишком сложный селектор.');
+    return null;
+  }
+}
+
+// Экранирование спецсимволов для CSS-селекторов
+function cssEscape(str) {
+  if (!str) return '';
+  return str.replace(/([\.\#\:\[\]\,\>\+\~\=\'\"\!\$\^\|\?\*\(\)\{\}\/ ])/g, '\\$1');
 }
 
 // Обработка горячей клавиши для остановки записи (Ctrl+Shift+S)
