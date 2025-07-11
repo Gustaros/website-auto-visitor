@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchDiv = document.createElement('div');
     searchDiv.id = 'searchDiv';
     searchDiv.style.margin = '10px 0';
-    searchDiv.innerHTML = '<input id="scenario-search" type="text" placeholder="Поиск сценария по имени..." style="width:95%">';
+    searchDiv.innerHTML = `<input id="scenario-search" type="text" placeholder="${t('searchScenario')}" style="width:95%">`;
     document.body.insertBefore(searchDiv, scenarioList);
   }
   searchInput = document.getElementById('scenario-search');
@@ -290,11 +290,12 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- UI для расписания ---
+  scheduleDiv = document.getElementById('scheduleDiv');
   if (!scheduleDiv) {
     scheduleDiv = document.createElement('div');
     scheduleDiv.id = 'scheduleDiv';
     scheduleDiv.style.margin = '10px 0';
-    scheduleDiv.innerHTML = '<b>Автозапуск по расписанию:</b><br><input id="schedule-time" type="time"> <button id="set-schedule">Установить</button>';
+    scheduleDiv.innerHTML = `<b>${t('autoRunSchedule')}</b><br><input id="schedule-time" type="time"> <button id="set-schedule">${t('setSchedule')}</button>`;
     document.body.appendChild(scheduleDiv);
   }
   scheduleInput = document.getElementById('schedule-time');
@@ -302,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setScheduleBtn.onclick = () => {
     if (!currentDomain || !scheduleInput.value) return;
     chrome.runtime.sendMessage({ type: 'SCHEDULE_SCENARIO', domain: currentDomain, time: scheduleInput.value }, resp => {
-      statusDiv.textContent = 'Автозапуск для ' + currentDomain + ' установлен на ' + scheduleInput.value;
+      statusDiv.textContent = t('scheduleSet', { domain: currentDomain, time: scheduleInput.value });
     });
   };
   // Показываем текущее расписание
@@ -310,15 +311,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const scheduled = resp.scheduledTasks || {};
     if (scheduled[currentDomain]) {
       scheduleInput.value = scheduled[currentDomain];
-      statusDiv.textContent += '\nАвтозапуск: ' + scheduled[currentDomain];
+      statusDiv.textContent += '\n' + t('autoRunSet', { time: scheduled[currentDomain] });
     }
   });
 
   // --- Экспорт/импорт сценариев ---
+  exportBtn = document.getElementById('exportBtn');
   if (!exportBtn) {
     exportBtn = document.createElement('button');
     exportBtn.id = 'exportBtn';
-    exportBtn.textContent = 'Экспорт сценариев';
+    exportBtn.textContent = t('exportScenarios');
     exportBtn.style.margin = '5px 0';
     exportBtn.onclick = () => {
       const data = JSON.stringify(scenarios, null, 2);
@@ -332,11 +334,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     document.body.appendChild(exportBtn);
   }
-
+  importBtn = document.getElementById('importBtn');
   if (!importBtn) {
     importBtn = document.createElement('button');
     importBtn.id = 'importBtn';
-    importBtn.textContent = 'Импорт сценариев';
+    importBtn.textContent = t('importScenarios');
     importBtn.style.margin = '5px 0';
     importBtn.onclick = () => {
       const input = document.createElement('input');
@@ -364,6 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Переключатель автозапуска всех сценариев при запуске браузера ---
+  autoRunSwitchDiv = document.getElementById('autoRunSwitchDiv');
   if (!autoRunSwitchDiv) {
     autoRunSwitchDiv = document.createElement('div');
     autoRunSwitchDiv.id = 'autoRunSwitchDiv';
@@ -375,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <label class="toggle-switch-label">
         <input type="checkbox" id="autoRunAllSwitch" class="toggle-switch-input">
         <span class="toggle-switch-slider"></span>
-        <span style="margin-left:12px;font-size:14px;">Автоматически запускать все сценарии при запуске браузера</span>
+        <span style="margin-left:12px;font-size:14px;">${t('autoRunAll')}</span>
       </label>
     `;
     document.body.appendChild(autoRunSwitchDiv);
@@ -722,7 +725,7 @@ if (!scheduleDiv) {
   scheduleDiv = document.createElement('div');
   scheduleDiv.id = 'scheduleDiv';
   scheduleDiv.style.margin = '10px 0';
-  scheduleDiv.innerHTML = '<b>Автозапуск по расписанию:</b><br><input id="schedule-time" type="time"> <button id="set-schedule">Установить</button>';
+  scheduleDiv.innerHTML = `<b>${t('autoRunSchedule')}</b><br><input id="schedule-time" type="time"> <button id="set-schedule">${t('setSchedule')}</button>`;
   document.body.appendChild(scheduleDiv);
 }
 scheduleInput = document.getElementById('schedule-time');
@@ -730,7 +733,7 @@ setScheduleBtn = document.getElementById('set-schedule');
 setScheduleBtn.onclick = () => {
   if (!currentDomain || !scheduleInput.value) return;
   chrome.runtime.sendMessage({ type: 'SCHEDULE_SCENARIO', domain: currentDomain, time: scheduleInput.value }, resp => {
-    statusDiv.textContent = 'Автозапуск для ' + currentDomain + ' установлен на ' + scheduleInput.value;
+    statusDiv.textContent = t('scheduleSet', { domain: currentDomain, time: scheduleInput.value });
   });
 };
 // Показываем текущее расписание
@@ -738,7 +741,7 @@ chrome.runtime.sendMessage({ type: 'GET_SCHEDULED_TASKS' }, resp => {
   const scheduled = resp.scheduledTasks || {};
   if (scheduled[currentDomain]) {
     scheduleInput.value = scheduled[currentDomain];
-    statusDiv.textContent += '\nАвтозапуск: ' + scheduled[currentDomain];
+    statusDiv.textContent += '\n' + t('autoRunSet', { time: scheduled[currentDomain] });
   }
 });
 
@@ -747,7 +750,7 @@ exportBtn = document.getElementById('exportBtn');
 if (!exportBtn) {
   exportBtn = document.createElement('button');
   exportBtn.id = 'exportBtn';
-  exportBtn.textContent = 'Экспорт сценариев';
+  exportBtn.textContent = t('exportScenarios');
   exportBtn.style.margin = '5px 0';
   exportBtn.onclick = () => {
     const data = JSON.stringify(scenarios, null, 2);
@@ -761,12 +764,11 @@ if (!exportBtn) {
   };
   document.body.appendChild(exportBtn);
 }
-
 importBtn = document.getElementById('importBtn');
 if (!importBtn) {
   importBtn = document.createElement('button');
   importBtn.id = 'importBtn';
-  importBtn.textContent = 'Импорт сценариев';
+  importBtn.textContent = t('importScenarios');
   importBtn.style.margin = '5px 0';
   importBtn.onclick = () => {
     const input = document.createElement('input');
@@ -806,7 +808,7 @@ if (!autoRunSwitchDiv) {
     <label class="toggle-switch-label">
       <input type="checkbox" id="autoRunAllSwitch" class="toggle-switch-input">
       <span class="toggle-switch-slider"></span>
-      <span style="margin-left:12px;font-size:14px;">Автоматически запускать все сценарии при запуске браузера</span>
+      <span style="margin-left:12px;font-size:14px;">${t('autoRunAll')}</span>
     </label>
   `;
   document.body.appendChild(autoRunSwitchDiv);

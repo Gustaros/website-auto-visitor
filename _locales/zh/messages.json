@@ -22,7 +22,7 @@
   "onboardingPlay": { "message": "重放您的场景。" },
   "onboardingAuto": { "message": "启用每日自动化。" },
   "setSchedule": { "message": "设置" },
-  "autoRunSchedule": { "message": "按计划自动运行：" },
+  "autoRunSchedule": { "message": "计划自动运行：" },
   "scrollRecorded": { "message": "滚动现在也会被记录！" },
   "importSuccess": { "message": "场景导入成功。" },
   "importError": { "message": "导入文件错误。" },

@@ -22,7 +22,7 @@
   "onboardingPlay": { "message": "Reproduce tu escenario." },
   "onboardingAuto": { "message": "Habilitar automatización diaria." },
   "setSchedule": { "message": "Establecer" },
-  "autoRunSchedule": { "message": "Ejecución automática por horario:" },
+  "autoRunSchedule": { "message": "Ejecución automática programada:" },
   "scrollRecorded": { "message": "¡El desplazamiento ahora también se graba!" },
   "importSuccess": { "message": "Escenarios importados correctamente." },
   "importError": { "message": "Error al importar el archivo." },

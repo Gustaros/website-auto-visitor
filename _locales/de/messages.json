@@ -22,7 +22,7 @@
   "onboardingPlay": { "message": "Spielen Sie Ihr Szenario ab." },
   "onboardingAuto": { "message": "Tägliche Automatisierung aktivieren." },
   "setSchedule": { "message": "Festlegen" },
-  "autoRunSchedule": { "message": "Automatischer Ablauf nach Zeitplan:" },
+  "autoRunSchedule": { "message": "Geplanter Auto-Start:" },
   "scrollRecorded": { "message": "Scrollen wird jetzt auch aufgezeichnet!" },
   "importSuccess": { "message": "Szenarien erfolgreich importiert." },
   "importError": { "message": "Fehler beim Importieren der Datei." },

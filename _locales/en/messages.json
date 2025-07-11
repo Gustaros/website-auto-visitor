@@ -69,7 +69,7 @@
     "message": "Set"
   },
   "autoRunSchedule": {
-    "message": "Auto-run by schedule:"
+    "message": "Scheduled auto-run:"
   },
   "scrollRecorded": {
     "message": "Scroll is now recorded too!"

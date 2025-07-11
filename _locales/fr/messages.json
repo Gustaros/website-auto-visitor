@@ -12,7 +12,7 @@
   "renameScenario": { "message": "Renommer le scénario" },
   "newScenarioName": { "message": "Entrez un nom pour le scénario :" },
   "importScenarios": { "message": "Importer des scénarios" },
-  "exportScenarios": { "message": "Exporter des scénarios" },
+  "exportScenarios": { "message": "Exporter les scénarios" },
   "autoRunAll": { "message": "Exécuter automatiquement tous les scénarios au démarrage du navigateur" },
   "searchScenario": { "message": "Rechercher un scénario par nom..." },
   "noActions": { "message": "Aucune action dans le scénario." },
@@ -22,7 +22,9 @@
   "onboardingPlay": { "message": "Rejouez votre scénario." },
   "onboardingAuto": { "message": "Activer l'automatisation quotidienne." },
   "setSchedule": { "message": "Définir" },
-  "autoRunSchedule": { "message": "Exécution automatique selon le planning :" },
+  "autoRunSchedule": { "message": "Démarrage auto programmé :" },
+  "scheduleSet": { "message": "Planification pour {domain} définie à {time}." },
+  "autoRunSet": { "message": "Démarrage auto : {time}" },
   "scrollRecorded": { "message": "Le défilement est maintenant aussi enregistré !" },
   "importSuccess": { "message": "Scénarios importés avec succès." },
   "importError": { "message": "Erreur lors de l'importation du fichier." },
@@ -47,11 +49,5 @@
   "tooltipImport": { "message": "Importer des scénarios depuis un fichier" },
   "tooltipAutoRun": { "message": "Exécuter automatiquement tous les scénarios au démarrage du navigateur" },
   "tooltipSchedule": { "message": "Définir un planning pour ce scénario" },
-  "tooltipDesc": { "message": "Ajouter ou modifier la description du scénario" },
-  "scheduleSet": {
-    "message": "Planification pour {domain} définie à {time}."
-  },
-  "autoRunSet": {
-    "message": "Démarrage auto : {time}"
-  }
+  "tooltipDesc": { "message": "Ajouter ou modifier la description du scénario" }
 }
