@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Загружаем сценарии
     chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
       scenarios = resp.scenarios || {};
-      console.log('[Website Auto Visitor] Загруженные сценарии:', scenarios); // диагностика
+      console.log('[Website Auto Visitor] Loaded scenarios:', scenarios); // diagnostics
       updateScenarioList();
     });
   });
