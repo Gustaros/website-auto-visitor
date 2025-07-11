@@ -56,5 +56,7 @@
   },
   "errorHttpOnly": { "message": "La extensión solo funciona en sitios normales (http/https)." },
   "errorDomainDetect": { "message": "No se pudo determinar el dominio." },
-  "current": { "message": "actual" }
+  "current": { "message": "actual" },
+  "selectScenarioStatus": { "message": "Seleccionado: {name} ({domain}). {count, plural, one{1 acción} other{{count} acciones}}." },
+  "playActionsConfirm": { "message": "Reproducir acciones: {name}?" }
 }

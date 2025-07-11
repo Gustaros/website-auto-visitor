@@ -52,5 +52,7 @@
   "tooltipDesc": { "message": "Ajouter ou modifier la description du scénario" },
   "errorHttpOnly": { "message": "L'extension fonctionne uniquement sur les sites classiques (http/https)." },
   "errorDomainDetect": { "message": "Impossible de déterminer le domaine." },
-  "current": { "message": "actuel" }
+  "current": { "message": "actuel" },
+  "selectScenarioStatus": { "message": "Sélectionné : {name} ({domain}). {count, plural, one{1 action} other{{count} actions}}." },
+  "playActionsConfirm": { "message": "Lire les actions : {name} ?" }
 }

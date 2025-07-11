@@ -56,5 +56,7 @@
   },
   "errorHttpOnly": { "message": "扩展仅适用于常规网站 (http/https)。" },
   "errorDomainDetect": { "message": "无法确定域名。" },
-  "current": { "message": "当前" }
+  "current": { "message": "当前" },
+  "selectScenarioStatus": { "message": "已选择: {name} ({domain})。{count, plural, one{1 个操作} other{{count} 个操作}}。" },
+  "playActionsConfirm": { "message": "播放操作: {name}?" }
 }

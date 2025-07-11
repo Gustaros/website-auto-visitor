@@ -160,5 +160,11 @@
   },
   "current": {
     "message": "current"
+  },
+  "selectScenarioStatus": {
+    "message": "Selected: {name} ({domain}). {count, plural, one{1 action} other{{count} actions}}."
+  },
+  "playActionsConfirm": {
+    "message": "Play actions: {name}?"
   }
 }

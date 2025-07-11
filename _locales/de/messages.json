@@ -56,5 +56,7 @@
   },
   "errorHttpOnly": { "message": "Die Erweiterung funktioniert nur auf regulären Seiten (http/https)." },
   "errorDomainDetect": { "message": "Domain konnte nicht ermittelt werden." },
-  "current": { "message": "aktuell" }
+  "current": { "message": "aktuell" },
+  "selectScenarioStatus": { "message": "Ausgewählt: {name} ({domain}). {count, plural, one{1 Aktion} other{{count} Aktionen}}." },
+  "playActionsConfirm": { "message": "Aktionen abspielen: {name}?" }
 }

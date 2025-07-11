@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recordedActions = scenario.actions || [];
         playBtn.disabled = !recordedActions.length;
         updateScenarioList();
-        statusDiv.textContent = t('selectScenario') + ': ' + selectedName + ' (' + domain + '). ' + t('statusStopped', { count: recordedActions.length });
+        statusDiv.textContent = t('selectScenarioStatus', { name: selectedName, domain, count: recordedActions.length });
         renderActionsList();
         showScenarioDesc(scenario.desc);
       };
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
       setSelectScenario();
       return;
     }
-    if (!confirm(t('playActions') + ': ' + (selectedName || selectedDomain) + '?')) return;
+    if (!confirm(t('playActionsConfirm', { name: (selectedName || selectedDomain) }))) return;
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: recordedActions}, (resp, err) => {
         if (err) {
@@ -689,7 +689,7 @@ function updateScenarioList() {
       recordedActions = scenario.actions || [];
       playBtn.disabled = !recordedActions.length;
       updateScenarioList();
-      statusDiv.textContent = t('selectScenario') + ': ' + selectedName + ' (' + domain + '). ' + t('statusStopped', { count: recordedActions.length });
+      statusDiv.textContent = t('selectScenarioStatus', { name: selectedName, domain, count: recordedActions.length });
       renderActionsList();
       showScenarioDesc(scenario.desc);
     };
@@ -707,7 +707,7 @@ playBtn.onclick = () => {
     setSelectScenario();
     return;
   }
-  if (!confirm(t('playActions') + ': ' + (selectedName || selectedDomain) + '?')) return;
+  if (!confirm(t('playActionsConfirm', { name: (selectedName || selectedDomain) }))) return;
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
     sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: recordedActions}, (resp, err) => {
       if (err) {
