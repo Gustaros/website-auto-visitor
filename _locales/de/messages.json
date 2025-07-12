@@ -61,5 +61,8 @@
   "playActionsConfirm": { "message": "Aktionen abspielen: {name}?" },
   "clearAllScenarios": { "message": "Alle Szenarien löschen" },
   "clearAllConfirm": { "message": "Möchten Sie wirklich alle Szenarien löschen? Dies kann nicht rückgängig gemacht werden." },
-  "clearAllDone": { "message": "Alle Szenarien wurden gelöscht." }
+  "clearAllDone": { "message": "Alle Szenarien wurden gelöscht." },
+  "seoDescription": {
+    "message": "Automatisieren Sie tägliche Webseitenbesuche und das Sammeln von Belohnungen. Nehmen Sie eigene Szenarien auf, planen Sie sie und spielen Sie sie für jede Website ab. Sparen Sie Zeit und erhalten Sie Ihre Boni automatisch!"
+  }
 }

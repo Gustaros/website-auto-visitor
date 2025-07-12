@@ -61,5 +61,8 @@
   "playActionsConfirm": { "message": "播放操作: {name}?" },
   "clearAllScenarios": { "message": "清除所有场景" },
   "clearAllConfirm": { "message": "您确定要删除所有场景吗？此操作无法撤销。" },
-  "clearAllDone": { "message": "所有场景已被删除。" }
+  "clearAllDone": { "message": "所有场景已被删除。" },
+  "seoDescription": {
+    "message": "自动化每日网站访问和奖励领取。录制、计划并重放您的自定义场景，适用于任何网站。节省时间，轻松获取每日奖励！"
+  }
 }

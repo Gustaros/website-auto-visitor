@@ -57,5 +57,8 @@
   "playActionsConfirm": { "message": "Lire les actions : {name} ?" },
   "clearAllScenarios": { "message": "Supprimer tous les scénarios" },
   "clearAllConfirm": { "message": "Êtes-vous sûr de vouloir supprimer tous les scénarios ? Cette action est irréversible." },
-  "clearAllDone": { "message": "Tous les scénarios ont été supprimés." }
+  "clearAllDone": { "message": "Tous les scénarios ont été supprimés." },
+  "seoDescription": {
+    "message": "Automatisez vos visites quotidiennes de sites et la collecte de récompenses. Enregistrez, planifiez et rejouez vos propres scénarios pour n'importe quel site. Gagnez du temps et recevez vos bonus automatiquement !"
+  }
 }

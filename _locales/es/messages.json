@@ -61,5 +61,8 @@
   "playActionsConfirm": { "message": "Reproducir acciones: {name}?" },
   "clearAllScenarios": { "message": "Eliminar todos los escenarios" },
   "clearAllConfirm": { "message": "¿Está seguro de que desea eliminar todos los escenarios? Esto no se puede deshacer." },
-  "clearAllDone": { "message": "Todos los escenarios han sido eliminados." }
+  "clearAllDone": { "message": "Todos los escenarios han sido eliminados." },
+  "seoDescription": {
+    "message": "Automatiza visitas diarias a sitios web y obtén recompensas fácilmente. Graba, programa y reproduce tus propios escenarios para cualquier página. Ahorra tiempo y maximiza tus bonificaciones diarias."
+  }
 }
