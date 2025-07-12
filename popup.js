@@ -294,6 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const timeInput = document.createElement('input');
       timeInput.type = 'time';
       timeInput.style.width = '80px';
+      // Открывать time picker по любому клику
+      timeInput.onclick = () => { if (timeInput.showPicker) timeInput.showPicker(); };
       const schedKey = scenario.url + '__' + idx;
       timeInput.value = scheduledTasks[schedKey] || '';
       timeInput.title = t('autoRunSchedule');
@@ -751,6 +753,8 @@ function updateScenarioList() {
     const timeInput = document.createElement('input');
     timeInput.type = 'time';
     timeInput.style.width = '80px';
+    // Открывать time picker по любому клику
+    timeInput.onclick = () => { if (timeInput.showPicker) timeInput.showPicker(); };
     const schedKey = scenario.url + '__' + idx;
     timeInput.value = scheduledTasks[schedKey] || '';
     timeInput.title = t('autoRunSchedule');
