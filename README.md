@@ -1,6 +1,6 @@
-# Website Auto Visitor
+# Browser Automation: Daily Check-in & Bonus Collector
 
-A browser extension for automating daily website visits, check-ins, and collecting rewards. Website Auto Visitor lets you record your actions (clicks, text input, and more) on any site and replay them automatically. Perfect for automating daily bonuses, check-ins, and repetitive web tasks. Supports multiple sites, scenarios, and full localization.
+A browser extension for automating daily check-ins, bonus collection, and routine web actions. Browser Automation: Daily Check-in & Bonus Collector lets you record your actions (clicks, text input, navigation) on any site and replay them automatically. Perfect for automating daily rewards, check-ins, and repetitive web tasks. Supports multiple sites, scenarios, and full localization.
 
 ## Key Features
 - **Record and replay actions:** Easily record clicks, text input, and navigation on any website using the extension popup, then replay them with one click.
@@ -22,7 +22,7 @@ A browser extension for automating daily website visits, check-ins, and collecti
 
 ## How It Works
 1. Open the website you want to automate.
-2. Open the Website Auto Visitor popup.
+2. Open the Browser Automation: Daily Check-in & Bonus Collector popup.
 3. Click **Start Recording** and perform your actions on the site.
 4. Click **Stop Recording** or use Ctrl+Shift+S to finish.
 5. The scenario is saved for the current site. Optionally, add a description.
@@ -50,4 +50,4 @@ A browser extension for automating daily website visits, check-ins, and collecti
 
 ---
 
-> Website Auto Visitor is under active development. Suggestions, feature requests, and bug reports are welcome on [GitHub Issues](https://github.com/yourusername/website-auto-visitor/issues)!
+> Browser Automation: Daily Check-in & Bonus Collector is under active development. Suggestions, feature requests, and bug reports are welcome on [GitHub Issues](https://github.com/yourusername/website-auto-visitor/issues)!

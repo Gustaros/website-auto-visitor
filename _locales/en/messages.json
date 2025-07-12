@@ -1,6 +1,6 @@
 {
   "appName": {
-    "message": "Website Auto Visitor"
+    "message": "Browser Automation: Daily Check-in & Bonus Collector"
   },
   "startRecording": {
     "message": "Start recording"
@@ -177,7 +177,7 @@
     "message": "All scenarios have been deleted."
   },
   "seoDescription": {
-    "message": "Automate daily website visits and actions to collect rewards, save time, and boost productivity. Record, schedule, and replay your own scenarios for any site. Perfect for daily check-ins, bonuses, and routine web tasks."
+    "message": "Automate daily check-ins, bonus collection, and routine web actions. Record, schedule, and replay your own scenarios for any site. Perfect for daily rewards, check-ins, and productivity!"
   },
   "advancedSection": {
     "message": "Advanced"

@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Website Auto Visitor" },
+  "appName": { "message": "Browser Automation: Daily Check-in & Bonus Collector" },
   "startRecording": { "message": "Aufnahme starten" },
   "stopRecording": { "message": "Aufnahme stoppen" },
   "playActions": { "message": "Aktionen abspielen" },
@@ -63,7 +63,7 @@
   "clearAllConfirm": { "message": "Möchten Sie wirklich alle Szenarien löschen? Dies kann nicht rückgängig gemacht werden." },
   "clearAllDone": { "message": "Alle Szenarien wurden gelöscht." },
   "seoDescription": {
-    "message": "Automatisieren Sie tägliche Webseitenbesuche und das Sammeln von Belohnungen. Nehmen Sie eigene Szenarien auf, planen Sie sie und spielen Sie sie für jede Website ab. Sparen Sie Zeit und erhalten Sie Ihre Boni automatisch!"
+    "message": "Automatisieren Sie tägliche Check-ins, Bonus-Sammlungen und Webaktionen. Nehmen Sie eigene Szenarien auf, planen Sie sie und spielen Sie sie für jede Website ab. Perfekt für tägliche Belohnungen, Check-ins und Produktivität!"
   },
   "advancedSection": { "message": "Erweitert" }
 }

@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "网站自动访问器" },
+  "appName": { "message": "浏览器自动化：每日签到与奖励收集" },
   "startRecording": { "message": "开始录制" },
   "stopRecording": { "message": "停止录制" },
   "playActions": { "message": "播放操作" },
@@ -63,7 +63,7 @@
   "clearAllConfirm": { "message": "您确定要删除所有场景吗？此操作无法撤销。" },
   "clearAllDone": { "message": "所有场景已被删除。" },
   "seoDescription": {
-    "message": "自动化每日网站访问和奖励领取。录制、计划并重放您的自定义场景，适用于任何网站。节省时间，轻松获取每日奖励！"
+    "message": "自动化每日签到、奖励收集和常规网页操作。录制、计划并重放您的自定义场景，适用于任何网站。非常适合每日奖励、签到和提升效率！"
   },
   "advancedSection": { "message": "高级" }
 }
