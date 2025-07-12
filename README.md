@@ -1,44 +1,53 @@
 # Website Auto Visitor
 
-A browser extension for automating the process of receiving daily rewards on various websites. It allows you to record user actions (clicks, text input) through the extension interface and play them back automatically. Supports working with multiple websites and scenarios.
+A browser extension for automating daily website visits, check-ins, and collecting rewards. Website Auto Visitor lets you record your actions (clicks, text input, and more) on any site and replay them automatically. Perfect for automating daily bonuses, check-ins, and repetitive web tasks. Supports multiple sites, scenarios, and full localization.
 
-## Key features
-- Record user actions on the website (clicks, text input) via the extension popup
-- Reproduce recorded scenarios to automate routine actions
-- Save scenarios by website domain
-- View and select scenarios for different websites
-- Control via popup and hotkeys
-- Cross-browser support (Chrome, Edge, Firefox)
-- Export, import and delete all scripts
-- Localisation: the entire interface supports multiple languages
-- Link to privacy policy
+## Key Features
+- **Record and replay actions:** Easily record clicks, text input, and navigation on any website using the extension popup, then replay them with one click.
+- **Scenario management:** Save, rename, describe, and organize multiple scenarios per website. Quickly switch between them.
+- **Advanced section:** Export, import, or delete all scenarios in one place. The Advanced section is collapsible and fully localized.
+- **Scheduling (coming soon):** Set up daily or timed automation for your scenarios (feature in roadmap).
+- **Auto-run:** Optionally run all scenarios automatically on browser startup.
+- **Cross-browser:** Works in Chrome, Edge, and Firefox.
+- **Full localization:** All UI elements, tooltips, and section titles are available in English, Russian, German, French, Spanish, and Chinese.
+- **Privacy-focused:** All data is stored locally. The Privacy Policy link is always at the bottom of the popup.
+- **Modern UI:** Clean, responsive popup with search, drag-and-drop, and onboarding tips.
 
 
-## How it works
-1. Open the website where you want to automate actions.
-2. Open the extension popup.
-3. Click ‘Start recording’ and perform the desired actions on the website.
-4. Stop recording using the hotkey (Ctrl+Shift+S) or popup.
-5. The script will be saved for the current website.
-6. Play the script via the popup.
-7. To export/import/delete all scripts, use the Advanced section.
+## Example Use Cases
+- Automate daily check-ins and bonus collections on gaming, crypto, or loyalty sites
+- Fill out repetitive forms or perform routine web tasks
+- Save time on sites that require daily manual actions
+- Quickly switch between different automation scenarios for different sites
+
+## How It Works
+1. Open the website you want to automate.
+2. Open the Website Auto Visitor popup.
+3. Click **Start Recording** and perform your actions on the site.
+4. Click **Stop Recording** or use Ctrl+Shift+S to finish.
+5. The scenario is saved for the current site. Optionally, add a description.
+6. Select and play back any scenario from the list.
+7. Use the **Advanced** section to export, import, or clear all scenarios.
 
 ## Limitations
-- Does not work on browser pages (chrome://, about:blank, etc.)
-- Does not support scheduled automation (can be added)
-- Only clicks and text input are supported (other actions are available on request)
+- Does not work on browser-internal pages (chrome://, about:blank, etc.)
+- Scheduled automation is not yet available (see roadmap)
+- Only clicks and text input are supported (scrolling and navigation coming soon)
+- No cloud sync: all data is stored locally in your browser
 
-## Development plans
-- Add support for additional actions (scrolling, following links)
-- Scheduled automation
-- Improved script editor
+## Roadmap
+- Add support for scrolling and link navigation
+- Scheduled and recurring automation
+- Improved scenario editor and visualizer
+- Cloud sync and backup
+- More onboarding and help features
 
 ## Installation
-1. Clone or download the project.
-2. Open the extension management page in your browser.
-3. Enable developer mode.
-4. Upload the project folder as an unpacked extension.
+1. Clone or download this repository.
+2. Open your browser's extensions management page (e.g., chrome://extensions/).
+3. Enable Developer Mode.
+4. Click "Load unpacked" and select the project folder.
 
 ---
 
-> The project is under development. All suggestions and bug reports are welcome!
+> Website Auto Visitor is under active development. Suggestions, feature requests, and bug reports are welcome on [GitHub Issues](https://github.com/yourusername/website-auto-visitor/issues)!
