@@ -655,6 +655,23 @@ document.addEventListener('DOMContentLoaded', () => {
     container.appendChild(rateBtn);
     container.appendChild(feedbackLink);
     document.body.appendChild(container);
+
+    // === Privacy Policy link (добавляем в самый низ) ===
+    if (!document.getElementById('privacyPolicyLink')) {
+      const privacyDiv = document.createElement('div');
+      privacyDiv.style.textAlign = 'center';
+      privacyDiv.style.margin = '18px 0 0 0';
+      privacyDiv.style.fontSize = '13px';
+      const privacyLink = document.createElement('a');
+      privacyLink.id = 'privacyPolicyLink';
+      privacyLink.href = 'privacy.html';
+      privacyLink.target = '_blank';
+      privacyLink.style.color = '#1976d2';
+      privacyLink.style.textDecoration = 'underline';
+      privacyLink.textContent = 'Privacy Policy';
+      privacyDiv.appendChild(privacyLink);
+      document.body.appendChild(privacyDiv);
+    }
   })();
 });
 
