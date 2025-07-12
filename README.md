@@ -50,4 +50,4 @@ A browser extension for automating daily check-ins, bonus collection, and routin
 
 ---
 
-> Browser Automation: Daily Check-in & Bonus Collector is under active development. Suggestions, feature requests, and bug reports are welcome on [GitHub Issues](https://github.com/yourusername/website-auto-visitor/issues)!
+> Browser Automation: Daily Check-in & Bonus Collector is under active development. Suggestions, feature requests, and bug reports are welcome on [GitHub Issues](https://github.com/Gustaros/website-auto-visitor/issues)!

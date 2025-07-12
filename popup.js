@@ -709,7 +709,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Feedback link
     const feedbackLink = document.createElement('a');
     feedbackLink.id = 'feedbackLink';
-    feedbackLink.href = 'https://github.com/yourusername/website-auto-visitor/issues';
+    feedbackLink.href = 'https://github.com/Gustaros/website-auto-visitor/issues';
     feedbackLink.target = '_blank';
     feedbackLink.rel = 'noopener noreferrer';
     feedbackLink.style.color = '#1976d2';
