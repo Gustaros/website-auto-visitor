@@ -19,7 +19,25 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     window.removeEventListener('click', handleClick, true);
     window.removeEventListener('input', handleInput, true);
     chrome.storage.local.set({ recording: false });
-    sendResponse({status: 'stopped', actions: recordedActions});
+    // Сохраняем сценарий всегда (как при хоткее)
+    chrome.storage.local.get('scenarios', data => {
+      const url = window.location.href;
+      const domain = window.location.hostname;
+      let scenarios = data.scenarios || {};
+      const key = url || domain;
+      const existing = (scenarios[key] || []);
+      let baseName = '';
+      try {
+        const parsed = new URL(url);
+        baseName = parsed.hostname + parsed.pathname;
+      } catch { baseName = domain; }
+      let name = baseName;
+      if (existing.length > 0) name += ` [${existing.length + 1}]`;
+      chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain, name, url}, () => {
+        sendResponse({status: 'stopped', actions: recordedActions});
+      });
+    });
+    return true;
   } else if (msg.type === 'PLAY_ACTIONS') {
     playActions(msg.actions || []);
     sendResponse({status: 'playing'});

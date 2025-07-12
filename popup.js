@@ -39,23 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
   let actionsDiv, scheduleDiv, scheduleInput, setScheduleBtn, exportBtn, importBtn, autoRunSwitchDiv, autoRunAllSwitch, searchDiv, searchInput;
   let scenarioFilter = '';
 
-  // Всегда назначаем обработчик Stop Recording
+  // Назначаем только один обработчик Stop Recording
   stopBtn.onclick = () => {
-    chrome.storage.local.get('recording', data => {
-      if (!data.recording) return; // Неактивно, если не идет запись
-      chrome.tabs.query({active: true, currentWindow: true}, tabs2 => {
-        sendMessageWithRetry(tabs2[0].id, {type: 'STOP_RECORDING'}, (resp2, err2) => {
-          if (err2) {
-            statusDiv.textContent = t('errorOnPage') + '\n' + err2;
-            return;
-          }
-          recordedActions = resp2.actions || [];
-          setStatusStopped(recordedActions.length);
-          startBtn.disabled = false;
-          stopBtn.disabled = true;
-          playBtn.disabled = recordedActions.length === 0;
-          chrome.storage.local.set({ recording: false });
-          // ...сохранение сценария, если нужно...
+    chrome.tabs.query({active: true, currentWindow: true}, tabs2 => {
+      sendMessageWithRetry(tabs2[0].id, {type: 'STOP_RECORDING'}, (resp2, err2) => {
+        if (err2) {
+          statusDiv.textContent = t('errorOnPage') + '\n' + err2;
+          return;
+        }
+        recordedActions = resp2.actions || [];
+        setStatusStopped(recordedActions.length);
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        playBtn.disabled = recordedActions.length === 0;
+        chrome.storage.local.set({ recording: false });
+        // После остановки всегда обновляем сценарии и UI
+        chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
+          scenarios = resp.scenarios || {};
+          updateScenarioList();
         });
       });
     });
@@ -70,8 +71,14 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.textContent = t('statusRecording');
         startBtn.disabled = true;
         stopBtn.disabled = false;
+        stopBtn.style.border = '';
         playBtn.disabled = true;
         showHotkeyHint();
+        // Показываем список сценариев даже во время записи
+        chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
+          scenarios = resp.scenarios || {};
+          updateScenarioList();
+        });
       } else {
         let url = '';
         try {
@@ -136,36 +143,23 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   stopBtn.onclick = () => {
-    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-      sendMessageWithRetry(tabs[0].id, {type: 'STOP_RECORDING'}, (resp, err) => {
-        if (err) {
-          statusDiv.textContent = t('errorOnPage') + '\n' + err;
+    chrome.tabs.query({active: true, currentWindow: true}, tabs2 => {
+      sendMessageWithRetry(tabs2[0].id, {type: 'STOP_RECORDING'}, (resp2, err2) => {
+        if (err2) {
+          statusDiv.textContent = t('errorOnPage') + '\n' + err2;
           return;
         }
-        recordedActions = resp.actions || [];
+        recordedActions = resp2.actions || [];
         setStatusStopped(recordedActions.length);
         startBtn.disabled = false;
         stopBtn.disabled = true;
         playBtn.disabled = recordedActions.length === 0;
         chrome.storage.local.set({ recording: false });
-        if (currentDomain) {
-          // Формируем имя сценария: domain + path + номер
-          const parsed = new URL(currentUrl);
-          let baseName = parsed.hostname + parsed.pathname;
-          // Считаем сколько уже сценариев для этого url
-          const existing = Object.values(scenarios).filter(s => s.url === currentUrl);
-          let name = baseName;
-          if (existing.length > 0) name += ` [${existing.length + 1}]`;
-          let desc = '';
-          if (descTextarea) desc = descTextarea.value;
-          chrome.runtime.sendMessage({type: 'SAVE_ACTIONS', actions: recordedActions, domain: currentDomain, name, desc, url: currentUrl}, () => {
-            chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
-              scenarios = resp.scenarios || {};
-              updateScenarioList();
-              renderActionsList();
-            });
-          });
-        }
+        // После остановки всегда обновляем сценарии и UI
+        chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
+          scenarios = resp.scenarios || {};
+          updateScenarioList();
+        });
       });
     });
   };
@@ -351,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderActionsList();
   }
 
-  playBtn.onclick = () => {
+  if (playBtn) playBtn.onclick = () => {
     if (!selectedArr || selectedIndex === -1 || !selectedArr[selectedIndex]) {
       setSelectScenario();
       return;
@@ -746,6 +740,12 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.appendChild(privacyDiv);
     }
   })();
+
+  function setStatusRecording() { statusDiv.textContent = t('statusRecording'); }
+  function setStatusStopped(count) { statusDiv.textContent = t('statusStopped', { count }); }
+  function setStatusPlaying() { statusDiv.textContent = t('statusPlaying'); }
+  function setDomainStatus(domain) { statusDiv.textContent = t('domain', { domain }); }
+  function setSelectScenario() { statusDiv.textContent = t('selectScenario'); }
 });
 
 // Локализация статусов и сообщений
@@ -1136,3 +1136,6 @@ function showHotkeyHint() {
   document.body.appendChild(hint);
   setTimeout(() => { hint.remove(); }, 5000);
 }
+
+// Заглушка для renderActionsList, чтобы устранить ошибку ReferenceError
+function renderActionsList() {}
