@@ -609,6 +609,49 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  // --- Дополнительный раздел (Advanced) ---
+  let advancedDiv = document.getElementById('advancedDiv');
+  if (!advancedDiv) {
+    advancedDiv = document.createElement('div');
+    advancedDiv.id = 'advancedDiv';
+    advancedDiv.style.margin = '18px 0 0 0';
+    advancedDiv.style.border = '1px solid #bdbdbd';
+    advancedDiv.style.borderRadius = '7px';
+    advancedDiv.style.background = '#f6f8fa';
+    advancedDiv.style.padding = '0';
+    advancedDiv.style.overflow = 'hidden';
+    advancedDiv.style.boxShadow = '0 1px 4px #0001';
+    // Кнопка раскрытия
+    const toggleBtn = document.createElement('button');
+    toggleBtn.textContent = t('advancedSection') || 'Advanced';
+    toggleBtn.style.width = '100%';
+    toggleBtn.style.background = '#1976d2';
+    toggleBtn.style.color = '#fff';
+    toggleBtn.style.fontWeight = 'bold';
+    toggleBtn.style.fontSize = '15px';
+    toggleBtn.style.border = 'none';
+    toggleBtn.style.borderRadius = '7px 7px 0 0';
+    toggleBtn.style.padding = '8px 0';
+    toggleBtn.style.cursor = 'pointer';
+    let expanded = false;
+    const contentDiv = document.createElement('div');
+    contentDiv.style.display = 'none';
+    contentDiv.style.padding = '12px 10px 10px 10px';
+    // Перемещаем кнопки внутрь contentDiv
+    if (exportBtn) contentDiv.appendChild(exportBtn);
+    if (importBtn) contentDiv.appendChild(importBtn);
+    if (clearAllBtn) contentDiv.appendChild(clearAllBtn);
+    // Переключение раскрытия
+    toggleBtn.onclick = () => {
+      expanded = !expanded;
+      contentDiv.style.display = expanded ? 'block' : 'none';
+      toggleBtn.style.borderRadius = expanded ? '7px 7px 0 0' : '7px';
+    };
+    advancedDiv.appendChild(toggleBtn);
+    advancedDiv.appendChild(contentDiv);
+    document.body.appendChild(advancedDiv);
+  }
+
   // === Feedback & Rate Extension ===
   (function addFeedbackAndRate() {
     if (document.getElementById('rateExtBtn')) return;

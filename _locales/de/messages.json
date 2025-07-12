@@ -64,5 +64,6 @@
   "clearAllDone": { "message": "Alle Szenarien wurden gelöscht." },
   "seoDescription": {
     "message": "Automatisieren Sie tägliche Webseitenbesuche und das Sammeln von Belohnungen. Nehmen Sie eigene Szenarien auf, planen Sie sie und spielen Sie sie für jede Website ab. Sparen Sie Zeit und erhalten Sie Ihre Boni automatisch!"
-  }
+  },
+  "advancedSection": { "message": "Erweitert" }
 }

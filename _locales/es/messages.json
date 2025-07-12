@@ -64,5 +64,6 @@
   "clearAllDone": { "message": "Todos los escenarios han sido eliminados." },
   "seoDescription": {
     "message": "Automatiza visitas diarias a sitios web y obtén recompensas fácilmente. Graba, programa y reproduce tus propios escenarios para cualquier página. Ahorra tiempo y maximiza tus bonificaciones diarias."
-  }
+  },
+  "advancedSection": { "message": "Avanzado" }
 }

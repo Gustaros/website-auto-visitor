@@ -60,5 +60,6 @@
   "clearAllDone": { "message": "Tous les scénarios ont été supprimés." },
   "seoDescription": {
     "message": "Automatisez vos visites quotidiennes de sites et la collecte de récompenses. Enregistrez, planifiez et rejouez vos propres scénarios pour n'importe quel site. Gagnez du temps et recevez vos bonus automatiquement !"
-  }
+  },
+  "advancedSection": { "message": "Avancé" }
 }

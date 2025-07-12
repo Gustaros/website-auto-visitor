@@ -178,5 +178,8 @@
   },
   "seoDescription": {
     "message": "Automate daily website visits and actions to collect rewards, save time, and boost productivity. Record, schedule, and replay your own scenarios for any site. Perfect for daily check-ins, bonuses, and routine web tasks."
+  },
+  "advancedSection": {
+    "message": "Advanced"
   }
 }
