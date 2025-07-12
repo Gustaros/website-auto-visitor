@@ -1,44 +1,44 @@
 # Website Auto Visitor
 
-Браузерное расширение для автоматизации получения ежедневных наград на различных сайтах. Позволяет записывать действия пользователя (клики, ввод текста) через интерфейс расширения и воспроизводить их автоматически. Поддерживает работу с несколькими сайтами и сценариями.
+A browser extension for automating the process of receiving daily rewards on various websites. It allows you to record user actions (clicks, text input) through the extension interface and play them back automatically. Supports working with multiple websites and scenarios.
 
-## Основные возможности
-- Запись пользовательских действий на сайте (клики, ввод текста) через popup расширения
-- Воспроизведение записанных сценариев для автоматизации рутинных действий
-- Сохранение сценариев по домену сайта
-- Просмотр и выбор сценариев для разных сайтов
-- Управление через popup и горячие клавиши
-- Кросс-браузерная поддержка (Chrome, Edge, Firefox)
-- Экспорт, импорт и удаление всех сценариев
-- Локализация: весь интерфейс поддерживает несколько языков
-- Ссылка на политику конфиденциальности
+## Key features
+- Record user actions on the website (clicks, text input) via the extension popup
+- Reproduce recorded scenarios to automate routine actions
+- Save scenarios by website domain
+- View and select scenarios for different websites
+- Control via popup and hotkeys
+- Cross-browser support (Chrome, Edge, Firefox)
+- Export, import and delete all scripts
+- Localisation: the entire interface supports multiple languages
+- Link to privacy policy
 
 
-## Как работает
-1. Откройте сайт, где хотите автоматизировать действия.
-2. Откройте popup расширения.
-3. Нажмите "Начать запись", выполните нужные действия на сайте.
-4. Остановите запись через горячую клавишу (Ctrl+Shift+S) или popup.
-5. Сценарий сохранится для текущего сайта.
-6. Воспроизведите сценарий через popup.
-7. Для экспорта/импорта/удаления всех сценариев используйте раздел Advanced.
+## How it works
+1. Open the website where you want to automate actions.
+2. Open the extension popup.
+3. Click ‘Start recording’ and perform the desired actions on the website.
+4. Stop recording using the hotkey (Ctrl+Shift+S) or popup.
+5. The script will be saved for the current website.
+6. Play the script via the popup.
+7. To export/import/delete all scripts, use the Advanced section.
 
-## Ограничения
-- Не работает на страницах браузера (chrome://, about:blank и т.д.)
-- Не поддерживает автоматизацию по расписанию (можно добавить)
-- Поддерживаются только клики и ввод текста (другие действия — по запросу)
+## Limitations
+- Does not work on browser pages (chrome://, about:blank, etc.)
+- Does not support scheduled automation (can be added)
+- Only clicks and text input are supported (other actions are available on request)
 
-## Планы по развитию
-- Добавить поддержку дополнительных действий (скролл, переходы по ссылкам)
-- Автоматизация по расписанию
-- Улучшенный редактор сценариев
+## Development plans
+- Add support for additional actions (scrolling, following links)
+- Scheduled automation
+- Improved script editor
 
-## Установка
-1. Склонируйте или скачайте проект.
-2. Откройте страницу управления расширениями в браузере.
-3. Включите режим разработчика.
-4. Загрузите папку проекта как распакованное расширение.
+## Installation
+1. Clone or download the project.
+2. Open the extension management page in your browser.
+3. Enable developer mode.
+4. Upload the project folder as an unpacked extension.
 
 ---
 
-> Проект находится в разработке. Все предложения и баг-репорты приветствуются!
+> The project is under development. All suggestions and bug reports are welcome!
