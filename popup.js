@@ -39,7 +39,29 @@ document.addEventListener('DOMContentLoaded', () => {
   let actionsDiv, scheduleDiv, scheduleInput, setScheduleBtn, exportBtn, importBtn, autoRunSwitchDiv, autoRunAllSwitch, searchDiv, searchInput;
   let scenarioFilter = '';
 
-  // Получаем домен текущей вкладки
+  // Всегда назначаем обработчик Stop Recording
+  stopBtn.onclick = () => {
+    chrome.storage.local.get('recording', data => {
+      if (!data.recording) return; // Неактивно, если не идет запись
+      chrome.tabs.query({active: true, currentWindow: true}, tabs2 => {
+        sendMessageWithRetry(tabs2[0].id, {type: 'STOP_RECORDING'}, (resp2, err2) => {
+          if (err2) {
+            statusDiv.textContent = t('errorOnPage') + '\n' + err2;
+            return;
+          }
+          recordedActions = resp2.actions || [];
+          setStatusStopped(recordedActions.length);
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+          playBtn.disabled = recordedActions.length === 0;
+          chrome.storage.local.set({ recording: false });
+          // ...сохранение сценария, если нужно...
+        });
+      });
+    });
+  };
+
+  // Получаем домен текущей вкладки и статус записи
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
     const tabId = tabs[0]?.id;
     if (!tabId) return;
@@ -50,24 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stopBtn.disabled = false;
         playBtn.disabled = true;
         showHotkeyHint();
-        // Кнопка остановки записи теперь работает всегда
-        stopBtn.onclick = () => {
-          chrome.tabs.query({active: true, currentWindow: true}, tabs2 => {
-            sendMessageWithRetry(tabs2[0].id, {type: 'STOP_RECORDING'}, (resp2, err2) => {
-              if (err2) {
-                statusDiv.textContent = t('errorOnPage') + '\n' + err2;
-                return;
-              }
-              recordedActions = resp2.actions || [];
-              setStatusStopped(recordedActions.length);
-              startBtn.disabled = false;
-              stopBtn.disabled = true;
-              playBtn.disabled = recordedActions.length === 0;
-              chrome.storage.local.set({ recording: false });
-              // ...сохранение сценария, если нужно...
-            });
-          });
-        };
       } else {
         let url = '';
         try {
@@ -95,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
           scenarios = resp.scenarios || {};
           updateScenarioList();
         });
+        stopBtn.disabled = true;
       }
     });
   });
