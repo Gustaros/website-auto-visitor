@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Website Auto Visitor",
   "version": "1.0.0",
-  "description": "Автоматически посещает сайты и выполняет действия для получения ежедневных наград. Позволяет записывать и воспроизводить действия пользователя.",
+  "description": "__MSG_seoDescription__",
   "icons": {
     "16": "images/icon16.png",
     "48": "images/icon48.png",
