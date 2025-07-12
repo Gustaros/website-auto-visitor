@@ -12,15 +12,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     recordedActions = [];
     window.addEventListener('click', handleClick, true);
     window.addEventListener('input', handleInput, true);
+    chrome.storage.local.set({ recording: true });
     sendResponse({status: 'recording'});
   } else if (msg.type === 'STOP_RECORDING') {
     isRecording = false;
     window.removeEventListener('click', handleClick, true);
     window.removeEventListener('input', handleInput, true);
+    chrome.storage.local.set({ recording: false });
     sendResponse({status: 'stopped', actions: recordedActions});
   } else if (msg.type === 'PLAY_ACTIONS') {
     playActions(msg.actions || []);
     sendResponse({status: 'playing'});
+  } else if (msg.type === 'GET_RECORDING_STATUS') {
+    sendResponse({ recording: isRecording });
   }
 });
 
@@ -217,6 +221,7 @@ document.addEventListener('keydown', function(e) {
     isRecording = false;
     window.removeEventListener('click', handleClick, true);
     window.removeEventListener('input', handleInput, true);
+    chrome.storage.local.set({ recording: false });
     // Получаем все сценарии для подсчёта номера
     chrome.storage.local.get('scenarios', data => {
       const url = window.location.href;

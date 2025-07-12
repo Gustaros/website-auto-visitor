@@ -41,31 +41,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Получаем домен текущей вкладки
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-    let url = '';
-    try {
-      url = tabs[0].url || '';
-      if (!url.startsWith('http')) {
-        statusDiv.textContent = t('errorHttpOnly');
+    const tabId = tabs[0]?.id;
+    if (!tabId) return;
+    chrome.tabs.sendMessage(tabId, { type: 'GET_RECORDING_STATUS' }, resp => {
+      if (resp && resp.recording) {
+        statusDiv.textContent = t('statusRecording');
         startBtn.disabled = true;
-        stopBtn.disabled = true;
+        stopBtn.disabled = false;
         playBtn.disabled = true;
-        return;
+        showHotkeyHint();
+        // Кнопка остановки записи теперь работает всегда
+        stopBtn.onclick = () => {
+          chrome.tabs.query({active: true, currentWindow: true}, tabs2 => {
+            sendMessageWithRetry(tabs2[0].id, {type: 'STOP_RECORDING'}, (resp2, err2) => {
+              if (err2) {
+                statusDiv.textContent = t('errorOnPage') + '\n' + err2;
+                return;
+              }
+              recordedActions = resp2.actions || [];
+              setStatusStopped(recordedActions.length);
+              startBtn.disabled = false;
+              stopBtn.disabled = true;
+              playBtn.disabled = recordedActions.length === 0;
+              chrome.storage.local.set({ recording: false });
+              // ...сохранение сценария, если нужно...
+            });
+          });
+        };
+      } else {
+        let url = '';
+        try {
+          url = tabs[0].url || '';
+          if (!url.startsWith('http')) {
+            statusDiv.textContent = t('errorHttpOnly');
+            startBtn.disabled = true;
+            stopBtn.disabled = true;
+            playBtn.disabled = true;
+            return;
+          }
+          const parsed = new URL(url);
+          currentDomain = parsed.hostname;
+          currentUrl = url;
+          statusDiv.textContent = t('domain', {domain: currentDomain});
+        } catch {
+          statusDiv.textContent = t('errorDomainDetect');
+          startBtn.disabled = true;
+          stopBtn.disabled = true;
+          playBtn.disabled = true;
+          return;
+        }
+        // Загружаем сценарии
+        chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
+          scenarios = resp.scenarios || {};
+          updateScenarioList();
+        });
       }
-      const parsed = new URL(url);
-      currentDomain = parsed.hostname;
-      currentUrl = url;
-      statusDiv.textContent = t('domain', {domain: currentDomain});
-    } catch {
-      statusDiv.textContent = t('errorDomainDetect');
-      startBtn.disabled = true;
-      stopBtn.disabled = true;
-      playBtn.disabled = true;
-      return;
-    }
-    // Загружаем сценарии
-    chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
-      scenarios = resp.scenarios || {};
-      updateScenarioList();
     });
   });
 
@@ -91,22 +121,16 @@ document.addEventListener('DOMContentLoaded', () => {
           statusDiv.textContent = t('errorOnPage') + '\n' + err;
           return;
         }
-        statusDiv.textContent = t('statusRecording');
+        statusDiv.textContent = t('statusRecording') + ' (Ctrl+Shift+S)';
         startBtn.disabled = true;
         stopBtn.disabled = false;
         playBtn.disabled = true;
+        showHotkeyHint();
       });
     });
   };
 
   stopBtn.onclick = () => {
-    if (!currentDomain) {
-      setDomainStatus('');
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-      playBtn.disabled = true;
-      return;
-    }
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       sendMessageWithRetry(tabs[0].id, {type: 'STOP_RECORDING'}, (resp, err) => {
         if (err) {
@@ -118,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startBtn.disabled = false;
         stopBtn.disabled = true;
         playBtn.disabled = recordedActions.length === 0;
+        chrome.storage.local.set({ recording: false });
         if (currentDomain) {
           // Формируем имя сценария: domain + path + номер
           const parsed = new URL(currentUrl);
@@ -1085,4 +1110,24 @@ function createIcon(name) {
   return i;
 }
 
-// Add new localization keys for scheduleSet and autoRunSet if not present in locales
+// Всплывающая подсказка о горячей клавише
+function showHotkeyHint() {
+  if (document.getElementById('hotkeyHint')) return;
+  const hint = document.createElement('div');
+  hint.id = 'hotkeyHint';
+  hint.textContent = t('hotkeyHintStopRecording');
+  hint.style.position = 'fixed';
+  hint.style.bottom = '18px';
+  hint.style.left = '50%';
+  hint.style.transform = 'translateX(-50%)';
+  hint.style.background = '#1976d2';
+  hint.style.color = '#fff';
+  hint.style.padding = '10px 18px';
+  hint.style.borderRadius = '8px';
+  hint.style.boxShadow = '0 2px 8px #0002';
+  hint.style.zIndex = 10001;
+  hint.style.fontSize = '15px';
+  hint.style.textAlign = 'center';
+  document.body.appendChild(hint);
+  setTimeout(() => { hint.remove(); }, 5000);
+}

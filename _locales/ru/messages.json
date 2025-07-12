@@ -181,5 +181,8 @@
   },
   "advancedSection": {
     "message": "Дополнительно"
+  },
+  "hotkeyHintStopRecording": {
+    "message": "Чтобы остановить запись, нажмите Ctrl+Shift+S на странице."
   }
 }

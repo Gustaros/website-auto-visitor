@@ -65,5 +65,8 @@
   "seoDescription": {
     "message": "Automatiza los check-ins diarios, la recolección de bonificaciones y las acciones web rutinarias. Graba, programa y reproduce tus propios escenarios para cualquier sitio. ¡Perfecto para recompensas diarias, check-ins y productividad!"
   },
-  "advancedSection": { "message": "Avanzado" }
+  "advancedSection": { "message": "Avanzado" },
+  "hotkeyHintStopRecording": {
+    "message": "Para detener la grabación, presione Ctrl+Shift+S en la página."
+  }
 }

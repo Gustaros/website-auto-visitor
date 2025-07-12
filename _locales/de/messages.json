@@ -65,5 +65,8 @@
   "seoDescription": {
     "message": "Automatisieren Sie tägliche Check-ins, Bonus-Sammlungen und Webaktionen. Nehmen Sie eigene Szenarien auf, planen Sie sie und spielen Sie sie für jede Website ab. Perfekt für tägliche Belohnungen, Check-ins und Produktivität!"
   },
-  "advancedSection": { "message": "Erweitert" }
+  "advancedSection": { "message": "Erweitert" },
+  "hotkeyHintStopRecording": {
+    "message": "Um die Aufnahme zu beenden, drücken Sie Strg+Shift+S auf der Seite."
+  }
 }

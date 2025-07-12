@@ -61,5 +61,8 @@
   "seoDescription": {
     "message": "Automatisez les check-ins quotidiens, la collecte de bonus et les actions web. Enregistrez, planifiez et rejouez vos propres scénarios pour n'importe quel site. Parfait pour les récompenses quotidiennes, les check-ins et la productivité !"
   },
-  "advancedSection": { "message": "Avancé" }
+  "advancedSection": { "message": "Avancé" },
+  "hotkeyHintStopRecording": {
+    "message": "Pour arrêter l'enregistrement, appuyez sur Ctrl+Maj+S sur la page."
+  }
 }

@@ -181,5 +181,8 @@
   },
   "advancedSection": {
     "message": "Advanced"
+  },
+  "hotkeyHintStopRecording": {
+    "message": "To stop recording, press Ctrl+Shift+S on the page."
   }
 }

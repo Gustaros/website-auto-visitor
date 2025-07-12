@@ -65,5 +65,8 @@
   "seoDescription": {
     "message": "自动化每日签到、奖励收集和常规网页操作。录制、计划并重放您的自定义场景，适用于任何网站。非常适合每日奖励、签到和提升效率！"
   },
-  "advancedSection": { "message": "高级" }
+  "advancedSection": { "message": "高级" },
+  "hotkeyHintStopRecording": {
+    "message": "要停止录制，请在页面上按 Ctrl+Shift+S。"
+  }
 }
