@@ -52,10 +52,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     });
     return true;
   } else if (msg.type === 'SCHEDULE_SCENARIO') {
-    const { domain, time } = msg;
-    scheduledTasks[domain] = time;
-    chrome.storage.local.set({ scheduledTasks }, () => {
-      sendResponse({ status: 'scheduled' });
+    // Новый формат: url и index
+    const { url, index, time } = msg;
+    const key = url + '__' + index;
+    chrome.storage.local.get('scheduledTasks', data => {
+      let scheduledTasks = data.scheduledTasks || {};
+      scheduledTasks[key] = time;
+      chrome.storage.local.set({ scheduledTasks }, () => {
+        sendResponse({ status: 'scheduled' });
+      });
     });
     return true;
   } else if (msg.type === 'GET_SCHEDULED_TASKS') {
@@ -74,29 +79,29 @@ setInterval(() => {
   chrome.storage.local.get(['scenarios', 'scheduledTasks'], data => {
     const now = new Date();
     const scheduled = data.scheduledTasks || {};
-    Object.entries(scheduled).forEach(([domain, time]) => {
+    const scenarios = data.scenarios || {};
+    Object.entries(scheduled).forEach(([key, time]) => {
+      const [url, idxStr] = key.split('__');
+      const idx = Number(idxStr);
       const [h, m] = time.split(':').map(Number);
       if (now.getHours() === h && now.getMinutes() === m) {
-        // Проверяем, есть ли открытая вкладка с этим доменом
+        const arr = scenarios[url] || [];
+        const scenario = arr[idx];
+        if (!scenario) return;
+        // Проверяем, есть ли открытая вкладка с этим url
         chrome.tabs.query({}, tabs => {
           let found = false;
           tabs.forEach(tab => {
-            try {
-              const url = new URL(tab.url);
-              if (url.hostname === domain) {
-                found = true;
-                // Запускаем сценарий на уже открытой вкладке
-                chrome.tabs.sendMessage(tab.id, { type: 'PLAY_ACTIONS', actions: (data.scenarios||{})[domain]?.actions || [] });
-              }
-            } catch {}
+            if (tab.url && tab.url.startsWith(url)) {
+              found = true;
+              chrome.tabs.sendMessage(tab.id, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
+            }
           });
           if (!found) {
-            // Открываем новую вкладку и запускаем сценарий после загрузки
-            chrome.tabs.create({ url: 'https://' + domain }, newTab => {
-              // Ждём загрузки страницы, затем отправляем PLAY_ACTIONS
+            chrome.tabs.create({ url: url }, newTab => {
               chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
                 if (tabId === newTab.id && info.status === 'complete') {
-                  chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: (data.scenarios||{})[domain]?.actions || [] });
+                  chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
                   chrome.tabs.onUpdated.removeListener(listener);
                 }
               });

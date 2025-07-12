@@ -154,6 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateScenarioList();
   };
 
+  let scheduledTasks = {};
+  chrome.runtime.sendMessage({ type: 'GET_SCHEDULED_TASKS' }, resp => {
+    scheduledTasks = resp.scheduledTasks || {};
+    updateScenarioList();
+  });
+
   function updateScenarioList() {
     if (!scenarioList) return;
     scenarioList.innerHTML = '';
@@ -176,7 +182,22 @@ document.addEventListener('DOMContentLoaded', () => {
     allScenarios.forEach(({ scenario, idx, arr, key }) => {
       const name = scenario.name || (scenario.domain + scenario.url);
       const li = document.createElement('li');
-      li.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
+      // Вместо textContent используем span для имени
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
+      nameSpan.style.flex = '1 1 auto';
+      nameSpan.style.cursor = 'pointer';
+      nameSpan.onclick = () => {
+        selectedArr = arr;
+        selectedIndex = idx;
+        recordedActions = scenario.actions || [];
+        playBtn.disabled = !recordedActions.length;
+        updateScenarioList();
+        statusDiv.textContent = t('selectScenarioStatus', { name: scenario.name, domain: scenario.domain, count: recordedActions.length });
+        renderActionsList();
+        showScenarioDesc(scenario.desc);
+      };
+      li.appendChild(nameSpan);
       li.style.cursor = 'pointer';
       li.style.padding = '2px 4px';
       li.style.borderRadius = '4px';
@@ -267,16 +288,29 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         };
       };
-      li.onclick = () => {
-        selectedArr = arr;
-        selectedIndex = idx;
-        recordedActions = scenario.actions || [];
-        playBtn.disabled = !recordedActions.length;
-        updateScenarioList();
-        statusDiv.textContent = t('selectScenarioStatus', { name: scenario.name, domain: scenario.domain, count: recordedActions.length });
-        renderActionsList();
-        showScenarioDesc(scenario.desc);
+      // --- Индивидуальное расписание ---
+      const scheduleWrap = document.createElement('span');
+      scheduleWrap.style.marginLeft = '10px';
+      const timeInput = document.createElement('input');
+      timeInput.type = 'time';
+      timeInput.style.width = '80px';
+      const schedKey = scenario.url + '__' + idx;
+      timeInput.value = scheduledTasks[schedKey] || '';
+      timeInput.title = t('autoRunSchedule');
+      const setBtn = document.createElement('button');
+      setBtn.textContent = t('setSchedule');
+      setBtn.style.marginLeft = '2px';
+      setBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (!timeInput.value) return;
+        chrome.runtime.sendMessage({ type: 'SCHEDULE_SCENARIO', url: scenario.url, index: idx, time: timeInput.value }, resp => {
+          scheduledTasks[schedKey] = timeInput.value;
+          statusDiv.textContent = t('scheduleSet', { domain: name, time: timeInput.value });
+        });
       };
+      scheduleWrap.appendChild(timeInput);
+      scheduleWrap.appendChild(setBtn);
+      li.appendChild(scheduleWrap);
       li.appendChild(renameBtn);
       li.appendChild(delBtn);
       li.appendChild(descBtn);
@@ -303,32 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   };
-
-  // --- UI для расписания ---
-  scheduleDiv = document.getElementById('scheduleDiv');
-  if (!scheduleDiv) {
-    scheduleDiv = document.createElement('div');
-    scheduleDiv.id = 'scheduleDiv';
-    scheduleDiv.style.margin = '10px 0';
-    scheduleDiv.innerHTML = `<b>${t('autoRunSchedule')}</b><br><input id="schedule-time" type="time"> <button id="set-schedule">${t('setSchedule')}</button>`;
-    document.body.appendChild(scheduleDiv);
-  }
-  scheduleInput = document.getElementById('schedule-time');
-  setScheduleBtn = document.getElementById('set-schedule');
-  setScheduleBtn.onclick = () => {
-    if (!currentDomain || !scheduleInput.value) return;
-    chrome.runtime.sendMessage({ type: 'SCHEDULE_SCENARIO', domain: currentDomain, time: scheduleInput.value }, resp => {
-      statusDiv.textContent = t('scheduleSet', { domain: currentDomain, time: scheduleInput.value });
-    });
-  };
-  // Показываем текущее расписание
-  chrome.runtime.sendMessage({ type: 'GET_SCHEDULED_TASKS' }, resp => {
-    const scheduled = resp.scheduledTasks || {};
-    if (scheduled[currentDomain]) {
-      scheduleInput.value = scheduled[currentDomain];
-      statusDiv.textContent += '\n' + t('autoRunSet', { time: scheduled[currentDomain] });
-    }
-  });
 
   // --- Экспорт/импорт сценариев ---
   exportBtn = document.getElementById('exportBtn');
@@ -631,7 +639,22 @@ function updateScenarioList() {
   allScenarios.forEach(({ scenario, idx, arr, key }) => {
     const name = scenario.name || (scenario.domain + scenario.url);
     const li = document.createElement('li');
-    li.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
+    // Вместо textContent используем span для имени
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
+    nameSpan.style.flex = '1 1 auto';
+    nameSpan.style.cursor = 'pointer';
+    nameSpan.onclick = () => {
+      selectedArr = arr;
+      selectedIndex = idx;
+      recordedActions = scenario.actions || [];
+      playBtn.disabled = !recordedActions.length;
+      updateScenarioList();
+      statusDiv.textContent = t('selectScenarioStatus', { name: scenario.name, domain: scenario.domain, count: recordedActions.length });
+      renderActionsList();
+      showScenarioDesc(scenario.desc);
+    };
+    li.appendChild(nameSpan);
     li.style.cursor = 'pointer';
     li.style.padding = '2px 4px';
     li.style.borderRadius = '4px';
@@ -722,16 +745,29 @@ function updateScenarioList() {
         }
       };
     };
-    li.onclick = () => {
-      selectedArr = arr;
-      selectedIndex = idx;
-      recordedActions = scenario.actions || [];
-      playBtn.disabled = !recordedActions.length;
-      updateScenarioList();
-      statusDiv.textContent = t('selectScenarioStatus', { name: scenario.name, domain: scenario.domain, count: recordedActions.length });
-      renderActionsList();
-      showScenarioDesc(scenario.desc);
+    // --- Индивидуальное расписание ---
+    const scheduleWrap = document.createElement('span');
+    scheduleWrap.style.marginLeft = '10px';
+    const timeInput = document.createElement('input');
+    timeInput.type = 'time';
+    timeInput.style.width = '80px';
+    const schedKey = scenario.url + '__' + idx;
+    timeInput.value = scheduledTasks[schedKey] || '';
+    timeInput.title = t('autoRunSchedule');
+    const setBtn = document.createElement('button');
+    setBtn.textContent = t('setSchedule');
+    setBtn.style.marginLeft = '2px';
+    setBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (!timeInput.value) return;
+      chrome.runtime.sendMessage({ type: 'SCHEDULE_SCENARIO', url: scenario.url, index: idx, time: timeInput.value }, resp => {
+        scheduledTasks[schedKey] = timeInput.value;
+        statusDiv.textContent = t('scheduleSet', { domain: name, time: timeInput.value });
+      });
     };
+    scheduleWrap.appendChild(timeInput);
+    scheduleWrap.appendChild(setBtn);
+    li.appendChild(scheduleWrap);
     li.appendChild(renameBtn);
     li.appendChild(delBtn);
     li.appendChild(descBtn);
@@ -758,32 +794,6 @@ playBtn.onclick = () => {
     });
   });
 };
-
-// --- UI для расписания ---
-scheduleDiv = document.getElementById('scheduleDiv');
-if (!scheduleDiv) {
-  scheduleDiv = document.createElement('div');
-  scheduleDiv.id = 'scheduleDiv';
-  scheduleDiv.style.margin = '10px 0';
-  scheduleDiv.innerHTML = `<b>${t('autoRunSchedule')}</b><br><input id="schedule-time" type="time"> <button id="set-schedule">${t('setSchedule')}</button>`;
-  document.body.appendChild(scheduleDiv);
-}
-scheduleInput = document.getElementById('schedule-time');
-setScheduleBtn = document.getElementById('set-schedule');
-setScheduleBtn.onclick = () => {
-  if (!currentDomain || !scheduleInput.value) return;
-  chrome.runtime.sendMessage({ type: 'SCHEDULE_SCENARIO', domain: currentDomain, time: scheduleInput.value }, resp => {
-    statusDiv.textContent = t('scheduleSet', { domain: currentDomain, time: scheduleInput.value });
-  });
-};
-// Показываем текущее расписание
-chrome.runtime.sendMessage({ type: 'GET_SCHEDULED_TASKS' }, resp => {
-  const scheduled = resp.scheduledTasks || {};
-  if (scheduled[currentDomain]) {
-    scheduleInput.value = scheduled[currentDomain];
-    statusDiv.textContent += '\n' + t('autoRunSet', { time: scheduled[currentDomain] });
-  }
-});
 
 // --- Экспорт/импорт сценариев ---
 exportBtn = document.getElementById('exportBtn');
