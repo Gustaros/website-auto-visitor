@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Auto Check-in & Bonus Collector" },
+  "appName": { "message": "Browser Automation: Daily Check-in & Bonus Collector" },
   "startRecording": { "message": "Démarrer l'enregistrement" },
   "stopRecording": { "message": "Arrêter l'enregistrement" },
   "playActions": { "message": "Lire les actions" },
