@@ -470,15 +470,10 @@ document.addEventListener('DOMContentLoaded', () => {
       applyTheme(theme);
     };
   }
-  function applyTheme(theme) {
-    if (theme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else if (theme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-  }
+  // Update popup title if needed
+  const h3 = document.querySelector('h3');
+  if (h3) h3.textContent = t('appName');
+
   // Автоопределение темы
   if (!localStorage.getItem('theme')) {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
