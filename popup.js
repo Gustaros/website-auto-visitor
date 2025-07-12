@@ -608,6 +608,54 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
   }
+
+  // === Feedback & Rate Extension ===
+  (function addFeedbackAndRate() {
+    if (document.getElementById('rateExtBtn')) return;
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.justifyContent = 'center';
+    container.style.alignItems = 'center';
+    container.style.gap = '10px';
+    container.style.margin = '18px 0 0 0';
+
+    // Rate button
+    const rateBtn = document.createElement('button');
+    rateBtn.id = 'rateExtBtn';
+    rateBtn.innerHTML = '<span class="material-icons" style="vertical-align:middle;font-size:18px;">star_rate</span> ' + (typeof chrome !== 'undefined' && chrome.i18n ? chrome.i18n.getMessage('rateExtension') || 'Rate extension' : 'Rate extension');
+    rateBtn.style.background = '#ffd54f';
+    rateBtn.style.color = '#333';
+    rateBtn.style.fontWeight = 'bold';
+    rateBtn.style.border = 'none';
+    rateBtn.style.borderRadius = '5px';
+    rateBtn.style.padding = '6px 16px';
+    rateBtn.style.cursor = 'pointer';
+    rateBtn.onclick = () => {
+      // Открыть страницу расширения в магазине (Chrome Web Store, Edge Addons, AMO)
+      const urls = [
+        'https://chrome.google.com/webstore/detail/website-auto-visitor/','https://microsoftedge.microsoft.com/addons/detail/','https://addons.mozilla.org/firefox/addon/'
+      ];
+      // Можно заменить на актуальный id/ссылку
+      window.open(urls[0], '_blank');
+    };
+
+    // Feedback link
+    const feedbackLink = document.createElement('a');
+    feedbackLink.id = 'feedbackLink';
+    feedbackLink.href = 'https://github.com/yourusername/website-auto-visitor/issues';
+    feedbackLink.target = '_blank';
+    feedbackLink.rel = 'noopener noreferrer';
+    feedbackLink.style.color = '#1976d2';
+    feedbackLink.style.fontSize = '14px';
+    feedbackLink.style.textDecoration = 'none';
+    feedbackLink.style.display = 'flex';
+    feedbackLink.style.alignItems = 'center';
+    feedbackLink.innerHTML = '<span class="material-icons" style="font-size:18px;vertical-align:middle;">feedback</span> <span style="margin-left:4px;">Feedback</span>';
+
+    container.appendChild(rateBtn);
+    container.appendChild(feedbackLink);
+    document.body.appendChild(container);
+  })();
 });
 
 // Локализация статусов и сообщений
