@@ -184,5 +184,11 @@
   },
   "hotkeyHintStopRecording": {
     "message": "Чтобы остановить запись, нажмите Ctrl+Shift+S на странице."
+  },
+  "runAllScenarios": {
+    "message": "Запустить все сценарии"
+  },
+  "runAllStarted": {
+    "message": "Запущены все сценарии."
   }
 }

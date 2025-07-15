@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const playBtn = document.getElementById('play-actions');
   const statusDiv = document.getElementById('status');
   const scenarioList = document.getElementById('scenario-list');
+  const runAllBtn = document.getElementById('run-all-btn');
 
   let recordedActions = [];
   let currentDomain = '';
@@ -439,6 +440,37 @@ document.addEventListener('DOMContentLoaded', () => {
   autoRunAllSwitch.onchange = () => {
     chrome.storage.local.set({ autoRunAllEnabled: autoRunAllSwitch.checked });
   };
+
+  // Кнопка "Запустить все сценарии"
+  if (runAllBtn) {
+    runAllBtn.textContent = t('runAllScenarios') || 'Запустить все сценарии';
+    runAllBtn.title = t('runAllScenarios') || 'Запустить все сценарии';
+    runAllBtn.onclick = () => {
+      runAllBtn.disabled = true;
+      chrome.storage.local.get('scenarios', data => {
+        const scenarios = data.scenarios || {};
+        let total = 0;
+        Object.entries(scenarios).forEach(([url, arr]) => {
+          if (!Array.isArray(arr)) return;
+          arr.forEach((scenario, idx) => {
+            if (!scenario.url) return;
+            total++;
+            chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+              chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+                if (tabId === newTab.id && info.status === 'complete') {
+                  chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
+                  setTimeout(() => chrome.tabs.remove(tabId), 10000);
+                  chrome.tabs.onUpdated.removeListener(listener);
+                }
+              });
+            });
+          });
+        });
+        statusDiv.textContent = t('runAllStarted') || `Запущено сценариев: ${total}`;
+        setTimeout(() => { runAllBtn.disabled = false; }, 5000);
+      });
+    };
+  }
 
   // Локализация кнопок и статусов
   if (startBtn) startBtn.textContent = t('startRecording');
@@ -1012,6 +1044,37 @@ chrome.storage.local.get('autoRunAllEnabled', data => {
 autoRunAllSwitch.onchange = () => {
   chrome.storage.local.set({ autoRunAllEnabled: autoRunAllSwitch.checked });
 };
+
+// Кнопка "Запустить все сценарии"
+if (runAllBtn) {
+  runAllBtn.textContent = t('runAllScenarios') || 'Запустить все сценарии';
+  runAllBtn.title = t('runAllScenarios') || 'Запустить все сценарии';
+  runAllBtn.onclick = () => {
+    runAllBtn.disabled = true;
+    chrome.storage.local.get('scenarios', data => {
+      const scenarios = data.scenarios || {};
+      let total = 0;
+      Object.entries(scenarios).forEach(([url, arr]) => {
+        if (!Array.isArray(arr)) return;
+        arr.forEach((scenario, idx) => {
+          if (!scenario.url) return;
+          total++;
+          chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+            chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+              if (tabId === newTab.id && info.status === 'complete') {
+                chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
+                setTimeout(() => chrome.tabs.remove(tabId), 10000);
+                chrome.tabs.onUpdated.removeListener(listener);
+              }
+            });
+          });
+        });
+      });
+      statusDiv.textContent = t('runAllStarted') || `Запущено сценариев: ${total}`;
+      setTimeout(() => { runAllBtn.disabled = false; }, 5000);
+    });
+  };
+}
 
 // --- Clear all scenarios button ---
 let clearAllBtn = document.getElementById('clearAllBtn');

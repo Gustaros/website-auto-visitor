@@ -127,17 +127,19 @@ chrome.runtime.onStartup.addListener(() => {
     const today = getTodayString();
     if (data.lastAutoRunDate === today) return; // Уже запускали сегодня
     const scenarios = data.scenarios || {};
-    Object.keys(scenarios).forEach(domain => {
-      // Открываем вкладку для каждого домена
-      chrome.tabs.create({ url: 'https://' + domain, active: false }, newTab => {
-        // Ждём загрузки страницы, затем отправляем PLAY_ACTIONS
-        chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
-          if (tabId === newTab.id && info.status === 'complete') {
-            chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenarios[domain]?.actions || [] });
-            // Закрываем вкладку через 10 секунд после запуска сценария
-            setTimeout(() => chrome.tabs.remove(tabId), 10000);
-            chrome.tabs.onUpdated.removeListener(listener);
-          }
+    // Для каждого url (ключа) перебираем все сценарии (массив)
+    Object.entries(scenarios).forEach(([url, arr]) => {
+      if (!Array.isArray(arr)) return;
+      arr.forEach((scenario, idx) => {
+        if (!scenario.url) return;
+        chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+          chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+            if (tabId === newTab.id && info.status === 'complete') {
+              chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
+              setTimeout(() => chrome.tabs.remove(tabId), 10000);
+              chrome.tabs.onUpdated.removeListener(listener);
+            }
+          });
         });
       });
     });

@@ -184,5 +184,11 @@
   },
   "hotkeyHintStopRecording": {
     "message": "To stop recording, press Ctrl+Shift+S on the page."
+  },
+  "runAllScenarios": {
+    "message": "Run all scenarios"
+  },
+  "runAllStarted": {
+    "message": "All scenarios started."
   }
 }
