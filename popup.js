@@ -456,13 +456,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!scenario.url) return;
             total++;
             chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
-              chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+              const listener = function(tabId, info) {
                 if (tabId === newTab.id && info.status === 'complete') {
-                  chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
-                  setTimeout(() => chrome.tabs.remove(tabId), 10000);
-                  chrome.tabs.onUpdated.removeListener(listener);
+                  console.log('[Website Auto Visitor] Tab loaded, waiting before sending PLAY_ACTIONS', tabId, scenario.url);
+                  setTimeout(() => {
+                    console.log('[Website Auto Visitor] Sending PLAY_ACTIONS to tab', tabId, scenario.url, scenario.actions);
+                    chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] }, (resp) => {
+                      console.log('[Website Auto Visitor] PLAY_ACTIONS sendMessage callback', resp);
+                    });
+                    setTimeout(() => chrome.tabs.remove(tabId), 10000);
+                    chrome.tabs.onUpdated.removeListener(listener);
+                  }, 1500);
                 }
-              });
+              };
+              chrome.tabs.onUpdated.addListener(listener);
             });
           });
         });
@@ -1060,20 +1067,27 @@ if (runAllBtn) {
           if (!scenario.url) return;
           total++;
           chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
-            chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+            const listener = function(tabId, info) {
               if (tabId === newTab.id && info.status === 'complete') {
-                chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
-                setTimeout(() => chrome.tabs.remove(tabId), 10000);
-                chrome.tabs.onUpdated.removeListener(listener);
+                console.log('[Website Auto Visitor] Tab loaded, waiting before sending PLAY_ACTIONS', tabId, scenario.url);
+                setTimeout(() => {
+                  console.log('[Website Auto Visitor] Sending PLAY_ACTIONS to tab', tabId, scenario.url, scenario.actions);
+                  chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] }, (resp) => {
+                    console.log('[Website Auto Visitor] PLAY_ACTIONS sendMessage callback', resp);
+                  });
+                  setTimeout(() => chrome.tabs.remove(tabId), 10000);
+                  chrome.tabs.onUpdated.removeListener(listener);
+                }, 1500);
               }
-            });
+            };
+            chrome.tabs.onUpdated.addListener(listener);
           });
         });
       });
       statusDiv.textContent = t('runAllStarted') || `Запущено сценариев: ${total}`;
       setTimeout(() => { runAllBtn.disabled = false; }, 5000);
     });
-  };
+  }
 }
 
 // --- Clear all scenarios button ---

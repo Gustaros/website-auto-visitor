@@ -1,4 +1,5 @@
 // Контент-скрипт для записи и воспроизведения действий пользователя
+console.log('[Website Auto Visitor] content.js script injected at', new Date().toISOString(), window.location.href);
 console.log('[Website Auto Visitor] content.js loaded on', window.location.href);
 
 // Глобальные переменные для хранения состояния записи и списка действий
@@ -39,6 +40,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     });
     return true;
   } else if (msg.type === 'PLAY_ACTIONS') {
+    console.log('[Website Auto Visitor] PLAY_ACTIONS received:', msg.actions);
     playActions(msg.actions || []);
     sendResponse({status: 'playing'});
   } else if (msg.type === 'GET_RECORDING_STATUS') {
