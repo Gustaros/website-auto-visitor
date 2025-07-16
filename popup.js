@@ -355,13 +355,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!scenario.actions || !scenario.actions.length) return;
     if (!confirm(t('playActionsConfirm', { name: scenario.name }))) return;
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-      sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: scenario.actions}, (resp, err) => {
-        if (err) {
-          statusDiv.textContent = t('errorOnPage') + '\n' + err;
-          return;
-        }
-        setStatusPlaying();
-      });
+      const tab = tabs[0];
+      // Проверяем, совпадает ли url активной вкладки с url сценария
+      if (tab && tab.url && tab.url.split('#')[0].split('?')[0] === scenario.url.split('#')[0].split('?')[0]) {
+        // На нужной странице — проиграть сценарий и не закрывать вкладку
+        sendMessageWithRetry(tab.id, {type: 'PLAY_ACTIONS', actions: scenario.actions}, (resp, err) => {
+          if (err) {
+            statusDiv.textContent = t('errorOnPage') + '\n' + err;
+            return;
+          }
+          setStatusPlaying();
+        });
+      } else {
+        // Не на нужной странице — открыть новую вкладку, проиграть сценарий и закрыть
+        chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+          const listener = function(tabId, info) {
+            if (tabId === newTab.id && info.status === 'complete') {
+              setTimeout(() => {
+                chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
+                setTimeout(() => chrome.tabs.remove(tabId), 10000);
+                chrome.tabs.onUpdated.removeListener(listener);
+              }, 1500);
+            }
+          };
+          chrome.tabs.onUpdated.addListener(listener);
+        });
+      }
     });
   };
 
@@ -966,13 +985,32 @@ playBtn.onclick = () => {
   if (!scenario.actions || !scenario.actions.length) return;
   if (!confirm(t('playActionsConfirm', { name: scenario.name }))) return;
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-    sendMessageWithRetry(tabs[0].id, {type: 'PLAY_ACTIONS', actions: scenario.actions}, (resp, err) => {
-      if (err) {
-        statusDiv.textContent = t('errorOnPage') + '\n' + err;
-        return;
-      }
-      setStatusPlaying();
-    });
+    const tab = tabs[0];
+    // Проверяем, совпадает ли url активной вкладки с url сценария
+    if (tab && tab.url && tab.url.split('#')[0].split('?')[0] === scenario.url.split('#')[0].split('?')[0]) {
+      // На нужной странице — проиграть сценарий и не закрывать вкладку
+      sendMessageWithRetry(tab.id, {type: 'PLAY_ACTIONS', actions: scenario.actions}, (resp, err) => {
+        if (err) {
+          statusDiv.textContent = t('errorOnPage') + '\n' + err;
+          return;
+        }
+        setStatusPlaying();
+      });
+    } else {
+      // Не на нужной странице — открыть новую вкладку, проиграть сценарий и закрыть
+      chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+        const listener = function(tabId, info) {
+          if (tabId === newTab.id && info.status === 'complete') {
+            setTimeout(() => {
+              chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
+              setTimeout(() => chrome.tabs.remove(tabId), 10000);
+              chrome.tabs.onUpdated.removeListener(listener);
+            }, 1500);
+          }
+        };
+        chrome.tabs.onUpdated.addListener(listener);
+      });
+    }
   });
 };
 
