@@ -132,7 +132,12 @@ chrome.runtime.onStartup.addListener(() => {
       if (!Array.isArray(arr)) return;
       arr.forEach((scenario, idx) => {
         if (!scenario.url) return;
-        chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+        let openUrl = scenario.url;
+        // Если url не начинается с http/https, добавить https://
+        if (!/^https?:\/\//i.test(openUrl)) {
+          openUrl = 'https://' + openUrl.replace(/^\/*/, '');
+        }
+        chrome.tabs.create({ url: openUrl, active: false }, newTab => {
           chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
             if (tabId === newTab.id && info.status === 'complete') {
               chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
