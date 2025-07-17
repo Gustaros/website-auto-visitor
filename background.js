@@ -135,7 +135,7 @@ chrome.runtime.onStartup.addListener(() => {
         let openUrl = scenario.url;
         // Если url не начинается с http/https, добавить https://
         if (!/^https?:\/\//i.test(openUrl)) {
-          openUrl = 'https://' + openUrl.replace(/^\/*/, '');
+          openUrl = 'https://' + openUrl.replace(/^https?:\/\//i, '').replace(/^\/*/, '');
         }
         chrome.tabs.create({ url: openUrl, active: false }, newTab => {
           chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
