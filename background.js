@@ -127,20 +127,21 @@ chrome.runtime.onStartup.addListener(() => {
     const today = getTodayString();
     if (data.lastAutoRunDate === today) return; // Уже запускали сегодня
     const scenarios = data.scenarios || {};
-    // Для каждого url (ключа) перебираем все сценарии (массив)
     Object.entries(scenarios).forEach(([url, arr]) => {
       if (!Array.isArray(arr)) return;
       arr.forEach((scenario, idx) => {
         if (!scenario.url) return;
-        // Открывать вкладку строго по scenario.url, без добавления https://
         chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
-          chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+          const listener = function(tabId, info) {
             if (tabId === newTab.id && info.status === 'complete') {
-              chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
-              setTimeout(() => chrome.tabs.remove(tabId), 10000);
-              chrome.tabs.onUpdated.removeListener(listener);
+              setTimeout(() => {
+                chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
+                setTimeout(() => chrome.tabs.remove(tabId), 10000);
+                chrome.tabs.onUpdated.removeListener(listener);
+              }, 1500);
             }
-          });
+          };
+          chrome.tabs.onUpdated.addListener(listener);
         });
       });
     });
