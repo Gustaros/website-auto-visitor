@@ -22,7 +22,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     chrome.storage.local.set({ recording: false });
     // Сохраняем сценарий всегда (как при хоткее)
     chrome.storage.local.get('scenarios', data => {
-      const url = window.location.href;
+      let url = window.location.href;
+      if (!/^https?:\/\//i.test(url)) {
+        url = 'https://' + url.replace(/^\/*/, '');
+      }
       const domain = window.location.hostname;
       let scenarios = data.scenarios || {};
       const key = url || domain;
