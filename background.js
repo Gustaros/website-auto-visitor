@@ -127,11 +127,14 @@ chrome.runtime.onStartup.addListener(() => {
     const today = getTodayString();
     if (data.lastAutoRunDate === today) return; // Уже запускали сегодня
     const scenarios = data.scenarios || {};
-    Object.entries(scenarios).forEach(([url, arr]) => {
+    Object.entries(scenarios).forEach(([key, arr]) => {
       if (!Array.isArray(arr)) return;
       arr.forEach((scenario, idx) => {
         if (!scenario.url) return;
-        chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+        // Используем url как есть
+        const openUrl = scenario.url;
+        console.log('[AutoRun] Открываю url:', openUrl);
+        chrome.tabs.create({ url: openUrl, active: false }, newTab => {
           const listener = function(tabId, info) {
             if (tabId === newTab.id && info.status === 'complete') {
               setTimeout(() => {
