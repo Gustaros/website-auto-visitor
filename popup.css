@@ -1077,6 +1077,37 @@ h3 .material-icons {
   color: var(--color-accent);
 }
 
+/* Scenario List Styles */
+.scenarios-section {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.scenario-list {
+  max-width: 100%;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.scenario-list li {
+  max-width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+  margin-bottom: var(--space-xs);
+}
+
+.scenario-list button,
+.scenario-list .scenario-item {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   *,
