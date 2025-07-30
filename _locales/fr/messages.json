@@ -66,5 +66,6 @@
     "message": "Pour arrêter l'enregistrement, appuyez sur Ctrl+Maj+S sur la page."
   },
   "runAllScenarios": { "message": "Exécuter tous les scénarios" },
-  "runAllStarted": { "message": "Tous les scénarios ont été lancés." }
+  "runAllStarted": { "message": "Tous les scénarios ont été lancés." },
+  "currentSite": { "message": "Site actuel :" }
 }

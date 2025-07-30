@@ -17,6 +17,8 @@ function t(key, vars) {
   }
   return key;
 }
+
+
 console.log('t(startRecording):', t('startRecording'));
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOMContentLoaded');
@@ -26,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusDiv = document.getElementById('status');
   const scenarioList = document.getElementById('scenario-list');
   const runAllBtn = document.getElementById('run-all-btn');
+  
 
   let recordedActions = [];
   let currentDomain = '';
@@ -87,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
           url = tabs[0].url || '';
           if (!url.startsWith('http')) {
             statusDiv.textContent = t('errorHttpOnly');
+            statusDiv.className = 'header-status error';
             startBtn.disabled = true;
             stopBtn.disabled = true;
             playBtn.disabled = true;
@@ -95,9 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
           const parsed = new URL(url);
           currentDomain = parsed.hostname;
           currentUrl = url;
-          statusDiv.textContent = t('domain', {domain: currentDomain});
+          statusDiv.textContent = t('currentSite') + ' ' + currentDomain;
+          statusDiv.className = 'header-status success';
         } catch {
           statusDiv.textContent = t('errorDomainDetect');
+          statusDiv.className = 'header-status error';
           startBtn.disabled = true;
           stopBtn.disabled = true;
           playBtn.disabled = true;
@@ -322,16 +328,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       };
       
-      controlsDiv.appendChild(renameBtn);
-      controlsDiv.appendChild(descBtn);
-      controlsDiv.appendChild(delBtn);
       // --- Индивидуальное расписание ---
       const scheduleWrap = document.createElement('span');
-      scheduleWrap.style.marginLeft = '10px';
+      scheduleWrap.style.marginLeft = '4px';
       const timeInput = document.createElement('input');
       timeInput.type = 'time';
-      timeInput.style.width = '80px';
-      // Открывать time picker по любому клику
+      timeInput.style.width = '60px';
+      timeInput.style.fontSize = '10px';
+      timeInput.style.height = '20px';
       timeInput.onclick = () => { if (timeInput.showPicker) timeInput.showPicker(); };
       const schedKey = scenario.url + '__' + idx;
       timeInput.value = scheduledTasks[schedKey] || '';
@@ -339,6 +343,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const setBtn = document.createElement('button');
       setBtn.textContent = t('setSchedule');
       setBtn.style.marginLeft = '2px';
+      setBtn.style.fontSize = '10px';
+      setBtn.style.padding = '2px 4px';
+      setBtn.style.height = '20px';
       setBtn.onclick = (e) => {
         e.stopPropagation();
         if (!timeInput.value) return;
@@ -350,6 +357,10 @@ document.addEventListener('DOMContentLoaded', () => {
       scheduleWrap.appendChild(timeInput);
       scheduleWrap.appendChild(setBtn);
       controlsDiv.appendChild(scheduleWrap);
+      
+      controlsDiv.appendChild(renameBtn);
+      controlsDiv.appendChild(descBtn);
+      controlsDiv.appendChild(delBtn);
       
       li.appendChild(controlsDiv);
       scenarioList.appendChild(li);

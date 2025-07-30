@@ -112,35 +112,87 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segue UI', system-ui, sans-serif;
   min-width: 380px;
   max-width: 420px;
   background: var(--color-bg);
   color: var(--color-fg);
   margin: 0;
-  padding: var(--space-lg);
+  padding: 6px;
   font-size: var(--font-size-sm);
-  line-height: 1.5;
+  line-height: 1.3;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Header */
-h3 {
-  margin: 0 0 var(--space-xl) 0;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-lg);
-  color: var(--color-fg);
-  text-align: center;
+/* Header Info */
+.header-info {
+  margin: 0 0 var(--space-xs) 0;
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-xs);
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.extension-link {
+  text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-sm);
-  padding: var(--space-md) var(--space-lg);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 4px;
+}
+
+.extension-link:hover {
+  border-color: var(--color-accent);
+  transform: scale(1.05);
+  background: var(--color-bg-tertiary);
+}
+
+.extension-link .extension-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+}
+
+.header-status {
+  flex: 1;
+  font-size: clamp(8px, 2.5vw, 14px);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+  min-width: 0;
   box-shadow: var(--shadow-sm);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-status.success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.header-status.error {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  border-color: var(--color-warning);
 }
 /* Button Styles */
 button {
@@ -166,11 +218,12 @@ button {
 button:not(.btn-secondary):not(.btn-danger):not(.btn-warning) {
   background: var(--color-accent);
   color: white;
-  padding: var(--space-md) var(--space-lg);
-  margin: var(--space-xs) 0;
+  padding: 6px var(--space-sm);
+  margin: 2px 0;
   width: 100%;
   box-shadow: var(--shadow-sm);
   border: 1px solid transparent;
+  height: 32px;
 }
 
 button:not(.btn-secondary):not(.btn-danger):not(.btn-warning):hover:not(:disabled) {
@@ -243,17 +296,17 @@ button:disabled {
 }
 /* Status Display */
 #status {
-  margin: var(--space-md) 0;
-  padding: var(--space-md);
-  min-height: 20px;
-  font-size: var(--font-size-sm);
+  margin: 2px 0;
+  padding: 4px;
+  min-height: 12px;
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   color: var(--color-success);
   text-align: center;
   word-break: break-word;
   background: var(--color-success-light);
   border: 1px solid var(--color-success);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   opacity: 0;
   animation: fadeIn var(--transition-slow) forwards;
 }
@@ -263,14 +316,14 @@ button:disabled {
 }
 /* Search Input */
 #searchDiv {
-  margin: var(--space-md) 0;
+  margin: 2px 0;
 }
 
 #searchDiv input {
   width: 100%;
-  padding: var(--space-md);
+  padding: var(--space-sm);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   font-family: inherit;
   background: var(--color-bg);
@@ -291,13 +344,13 @@ button:disabled {
 
 /* Scenario List */
 ul#scenario-list {
-  margin: var(--space-md) 0;
+  margin: 2px 0;
   padding: 0;
   list-style: none;
-  max-height: 280px;
+  max-height: 100px;
   overflow-y: auto;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--color-bg);
   box-shadow: var(--shadow-sm);
 }
@@ -313,13 +366,13 @@ ul#scenario-list:empty::before {
 
 ul#scenario-list li {
   margin: 0;
-  padding: var(--space-md);
+  padding: var(--space-xs);
   border-bottom: 1px solid var(--color-border-light);
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   transition: all var(--transition-normal);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   cursor: pointer;
   position: relative;
   background: var(--color-bg);
@@ -356,10 +409,10 @@ ul#scenario-list li .scenario-controls {
 /* List Item Buttons */
 ul#scenario-list button {
   width: auto;
-  min-width: 32px;
-  height: 32px;
+  min-width: 24px;
+  height: 24px;
   margin: 0;
-  padding: var(--space-xs);
+  padding: 2px;
   font-size: var(--font-size-xs);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
@@ -404,12 +457,12 @@ ul#scenario-list button.btn-desc:hover {
 #actions-list {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  margin: var(--space-md) 0;
-  padding: var(--space-md);
-  max-height: 200px;
+  border-radius: var(--radius-md);
+  margin: var(--space-xs) 0;
+  padding: var(--space-xs);
+  max-height: 80px;
   overflow-y: auto;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   box-shadow: var(--shadow-sm);
 }
 
@@ -421,15 +474,14 @@ ul#scenario-list button.btn-desc:hover {
 
 #actions-list li {
   margin-bottom: var(--space-xs);
-  padding: var(--space-xs) 0;
+  padding: var(--space-xs);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   cursor: grab;
   background: var(--color-bg-secondary);
   border-radius: var(--radius-sm);
-  padding: var(--space-sm);
   border: 1px solid var(--color-border-light);
   transition: all var(--transition-fast);
 }
@@ -456,10 +508,10 @@ ul#scenario-list button.btn-desc:hover {
   border: none;
   box-shadow: var(--shadow-sm);
   font-size: var(--font-size-xs);
-  margin-left: var(--space-sm);
-  padding: var(--space-xs) var(--space-sm);
-  min-width: 28px;
-  height: 28px;
+  margin-left: var(--space-xs);
+  padding: 2px;
+  min-width: 20px;
+  height: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -514,11 +566,11 @@ ul#scenario-list button.btn-desc:hover {
 
 /* Description Area */
 #descDiv {
-  margin: var(--space-md) 0;
-  padding: var(--space-md);
+  margin: var(--space-xs) 0;
+  padding: var(--space-sm);
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   transition: all var(--transition-normal);
 }
 
@@ -532,7 +584,7 @@ ul#scenario-list button.btn-desc:hover {
 
 #descDiv textarea {
   width: 100%;
-  padding: var(--space-md);
+  padding: var(--space-sm);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
@@ -541,8 +593,8 @@ ul#scenario-list button.btn-desc:hover {
   color: var(--color-fg);
   resize: vertical;
   transition: all var(--transition-normal);
-  min-height: 60px;
-  max-height: 120px;
+  min-height: 40px;
+  max-height: 80px;
 }
 
 #descDiv textarea:focus {
@@ -577,16 +629,16 @@ ul#scenario-list button.btn-desc:hover {
   align-items: center;
   cursor: pointer;
   user-select: none;
-  gap: var(--space-md);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  gap: var(--space-xs);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
   color: var(--color-fg);
-  padding: var(--space-md);
+  padding: var(--space-xs);
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   transition: all var(--transition-normal);
-  margin: var(--space-md) 0;
+  margin: var(--space-xs) 0;
 }
 
 .toggle-switch-label:hover {
@@ -599,10 +651,10 @@ ul#scenario-list button.btn-desc:hover {
 }
 
 .toggle-switch-slider {
-  width: 48px;
-  height: 24px;
+  width: 32px;
+  height: 16px;
   background: var(--color-border);
-  border-radius: 24px;
+  border-radius: 16px;
   position: relative;
   transition: all var(--transition-normal);
   flex-shrink: 0;
@@ -614,8 +666,8 @@ ul#scenario-list button.btn-desc:hover {
   position: absolute;
   left: 2px;
   top: 2px;
-  width: 20px;
-  height: 20px;
+  width: 12px;
+  height: 12px;
   background: white;
   border-radius: 50%;
   transition: all var(--transition-normal);
@@ -627,7 +679,7 @@ ul#scenario-list button.btn-desc:hover {
 }
 
 .toggle-switch-input:checked + .toggle-switch-slider:before {
-  transform: translateX(24px);
+  transform: translateX(16px);
   box-shadow: var(--shadow-md);
 }
 
@@ -637,7 +689,7 @@ ul#scenario-list button.btn-desc:hover {
 }
 /* Container Divs */
 #autoRunSwitchDiv {
-  margin: var(--space-lg) 0;
+  margin: 2px 0;
 }
 
 #themeSwitchDiv {
@@ -659,9 +711,9 @@ ul#scenario-list button.btn-desc:hover {
 
 /* Advanced Section */
 #advancedDiv {
-  margin: var(--space-xl) 0 var(--space-lg) 0;
+  margin: 2px 0 0 0;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-sm);
   background: var(--color-bg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
@@ -676,8 +728,9 @@ ul#scenario-list button.btn-desc:hover {
   width: 100%;
   background: var(--color-accent);
   color: white;
-  font-weight: var(--font-weight-semibold);
-  padding: var(--space-md);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-xs);
+  padding: var(--space-xs);
   border: none;
   cursor: pointer;
   transition: all var(--transition-normal);
@@ -692,10 +745,11 @@ ul#scenario-list button.btn-desc:hover {
 
 #advancedDiv .toggle-button .material-icons {
   transition: transform var(--transition-normal);
+  font-size: 16px;
 }
 
 #advancedDiv .content {
-  padding: var(--space-lg);
+  padding: var(--space-sm);
   background: var(--color-bg-secondary);
   border-top: 1px solid var(--color-border-light);
   transition: all var(--transition-normal);
@@ -891,13 +945,13 @@ textarea:focus-visible {
 
 /* New Structure Styles */
 header {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-xs);
 }
 
 main {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: 2px;
 }
 
 .controls-section {
@@ -909,7 +963,7 @@ main {
 .scenarios-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 
 /* Fix for scenario list items to have proper CSS class selector styles */
@@ -923,9 +977,10 @@ ul#scenario-list li .scenario-name {
 
 ul#scenario-list li .scenario-controls {
   display: flex;
-  gap: var(--space-xs);
+  gap: 2px;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
 .status-display {
@@ -947,16 +1002,16 @@ ul#scenario-list li .scenario-controls {
 
 /* Footer Styles */
 .footer {
-  margin-top: var(--space-xl);
-  padding-top: var(--space-lg);
+  margin-top: 2px;
+  padding-top: 4px;
   border-top: 1px solid var(--color-border);
 }
 
 .footer-links {
   display: flex;
   justify-content: center;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-md);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
 }
 
 .footer-link {
@@ -965,9 +1020,9 @@ ul#scenario-list li .scenario-controls {
   gap: var(--space-xs);
   color: var(--color-accent);
   text-decoration: none;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
   transition: all var(--transition-normal);
   background: var(--color-bg-secondary);
@@ -982,7 +1037,7 @@ ul#scenario-list li .scenario-controls {
 }
 
 .footer-link .material-icons {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .privacy-link {
@@ -1012,8 +1067,13 @@ button .material-icons {
   font-size: 18px;
 }
 
+/* Smaller icons for scenario list buttons */
+ul#scenario-list button .material-icons {
+  font-size: 14px;
+}
+
 h3 .material-icons {
-  font-size: 24px;
+  font-size: 16px;
   color: var(--color-accent);
 }
 
