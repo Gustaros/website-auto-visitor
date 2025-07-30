@@ -780,7 +780,7 @@ ul#scenario-list button.btn-desc:hover {
   }
   
   #actions-list, ul#scenario-list { 
-    max-height: 200px; 
+    max-height: 180px; 
   }
   
   button {
@@ -807,7 +807,7 @@ ul#scenario-list button.btn-desc:hover {
 
 @media (max-width: 320px) {
   body { 
-    min-width: 280px;
+    min-width: 300px;
     font-size: var(--font-size-xs);
   }
   
