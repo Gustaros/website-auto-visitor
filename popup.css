@@ -712,7 +712,6 @@ ul#scenario-list button.btn-desc:hover {
 /* Advanced Section */
 #advancedDiv {
   margin: 2px 0 0 0;
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-bg);
   overflow: hidden;
@@ -736,7 +735,6 @@ ul#scenario-list button.btn-desc:hover {
   transition: all var(--transition-normal);
   display: flex;
   align-items: center;
-  justify-content: space-between;
 }
 
 #advancedDiv .toggle-button:hover {
