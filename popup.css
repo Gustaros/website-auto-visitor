@@ -790,7 +790,7 @@ ul#scenario-list button.btn-desc:hover {
   }
   
   .toggle-switch-label {
-    flex-direction: column;
+    flex-direction: raw;
     align-items: flex-start;
     gap: var(--space-sm);
   }
