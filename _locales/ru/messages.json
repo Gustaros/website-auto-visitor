@@ -158,6 +158,9 @@
   "errorDomainDetect": {
     "message": "Не удалось определить домен."
   },
+  "currentSite": {
+    "message": "Текущий сайт:"
+  },
   "current": {
     "message": "текущий"
   },

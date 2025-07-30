@@ -70,5 +70,6 @@
     "message": "Um die Aufnahme zu beenden, drücken Sie Strg+Shift+S auf der Seite."
   },
   "runAllScenarios": { "message": "Alle Szenarien ausführen" },
-  "runAllStarted": { "message": "Alle Szenarien wurden gestartet." }
+  "runAllStarted": { "message": "Alle Szenarien wurden gestartet." },
+  "currentSite": { "message": "Aktuelle Seite:" }
 }

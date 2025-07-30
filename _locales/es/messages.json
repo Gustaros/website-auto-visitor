@@ -70,5 +70,6 @@
     "message": "Para detener la grabación, presione Ctrl+Shift+S en la página."
   },
   "runAllScenarios": { "message": "Ejecutar todos los escenarios" },
-  "runAllStarted": { "message": "Todos los escenarios han sido iniciados." }
+  "runAllStarted": { "message": "Todos los escenarios han sido iniciados." },
+  "currentSite": { "message": "Sitio actual:" }
 }

@@ -70,5 +70,6 @@
     "message": "要停止录制，请在页面上按 Ctrl+Shift+S。"
   },
   "runAllScenarios": { "message": "运行所有场景" },
-  "runAllStarted": { "message": "所有场景已启动。" }
+  "runAllStarted": { "message": "所有场景已启动。" },
+  "currentSite": { "message": "当前网站：" }
 }

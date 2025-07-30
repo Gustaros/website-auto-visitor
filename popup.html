@@ -1,29 +1,126 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
-  <title>Website Auto Visitor</title>
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browser Automation: Daily Check-in & Bonus Collector</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
-  <h3>Website Auto Visitor</h3>
-  <button id="start-record"></button>
-  <button id="stop-record" disabled></button>
-  <button id="play-actions" disabled></button>
-  <button id="run-all-btn"><span class="material-icons" style="vertical-align:middle;">play_circle</span> <span>Запустить все сценарии</span></button>
-  <div id="status"></div>
-  <ul id="scenario-list">
-    <li id="scroll-recorded-msg" style="color: #888; font-size: 12px;"></li>
-  </ul>
-  <button id="clearAllBtn"></button>
-  <div id="descDiv" style="display:none; margin:8px 0;">
-    <label for="scenario-desc" id="descLabel"></label><br>
-    <textarea id="scenario-desc" rows="2" style="width:98%;resize:vertical;min-height:32px;max-height:80px;"></textarea>
+  <div class="header-info">
+    <a href="#" id="extension-icon" class="extension-link">
+      <img src="images/icon48.png" alt="Extension Icon" class="extension-icon">
+    </a>
+    <div id="status" class="header-status"></div>
   </div>
+
+  <main>
+    <!-- Control Buttons -->
+    <section class="controls-section">
+      <button id="start-record" class="btn-primary">
+        <span class="material-icons">fiber_manual_record</span>
+        <span>Start Recording</span>
+      </button>
+      
+      <button id="stop-record" class="btn-secondary" disabled>
+        <span class="material-icons">stop</span>
+        <span>Stop Recording</span>
+      </button>
+      
+      <button id="play-actions" class="btn-primary" disabled>
+        <span class="material-icons">play_arrow</span>
+        <span>Play Actions</span>
+      </button>
+      
+      <button id="run-all-btn" class="btn-warning">
+        <span class="material-icons">play_circle</span>
+        <span>Run All Scenarios</span>
+      </button>
+    </section>
+
+
+    <!-- Search and Scenarios -->
+    <section class="scenarios-section">
+      <div id="searchDiv">
+        <input type="text" id="scenario-search" placeholder="Search scenarios...">
+      </div>
+      
+      <ul id="scenario-list" class="scenario-list">
+        <!-- Scenarios will be populated by JavaScript -->
+      </ul>
+    </section>
+
+    <!-- Description Area -->
+    <div id="descDiv" class="description-area" style="display:none;">
+      <label for="scenario-desc" id="descLabel">Description:</label>
+      <textarea id="scenario-desc" placeholder="Add a description for this scenario (optional)"></textarea>
+    </div>
+
+    <!-- Actions List -->
+    <div id="actions-list" class="actions-list" style="display:none;">
+      <ul></ul>
+    </div>
+
+    <!-- Auto-run Toggle -->
+    <div id="autoRunSwitchDiv">
+      <label class="toggle-switch-label">
+        <input type="checkbox" id="autoRunAllSwitch" class="toggle-switch-input">
+        <span class="toggle-switch-slider"></span>
+        <span>Automatically run all scenarios on browser startup</span>
+      </label>
+    </div>
+
+    <!-- Advanced Section -->
+    <div id="advancedDiv" class="advanced-section">
+      <button class="toggle-button" type="button">
+        <span>Advanced</span>
+        <span class="material-icons">keyboard_arrow_down</span>
+      </button>
+      <div class="content" style="display:none;">
+        <button id="exportBtn" class="btn-secondary">
+          <span class="material-icons">download</span>
+          <span>Export Scenarios</span>
+        </button>
+        
+        <button id="importBtn" class="btn-secondary">
+          <span class="material-icons">upload</span>
+          <span>Import Scenarios</span>
+        </button>
+        
+        <button id="clearAllBtn" class="btn-danger">
+          <span class="material-icons">delete_sweep</span>
+          <span>Clear All Scenarios</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="#" id="rateExtBtn" class="footer-link">
+        <span class="material-icons">star_rate</span>
+        <span>Rate Extension</span>
+      </a>
+      
+      <a href="https://github.com/Gustaros/website-auto-visitor/issues" 
+         target="_blank" 
+         rel="noopener noreferrer" 
+         class="footer-link">
+        <span class="material-icons">feedback</span>
+        <span>Feedback</span>
+      </a>
+    </div>
+    
+    <div class="privacy-link">
+      <a href="privacy.html" target="_blank">Privacy Policy</a>
+    </div>
+  </footer>
+
   <script src="popup.js"></script>
 </body>
 

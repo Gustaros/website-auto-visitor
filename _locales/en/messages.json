@@ -158,6 +158,9 @@
   "errorDomainDetect": {
     "message": "Could not determine domain."
   },
+  "currentSite": {
+    "message": "Current site:"
+  },
   "current": {
     "message": "current"
   },
