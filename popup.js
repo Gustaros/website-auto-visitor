@@ -40,6 +40,18 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedIndex = -1;
   let scheduledTasks = {};
 
+  function getValidUrl(url) {
+    if (typeof url !== 'string') return null;
+    let fixedUrl = url.trim();
+    // Replace repeated protocol prefixes like https://https://... with a single one.
+    fixedUrl = fixedUrl.replace(/^(https?:\/\/)+/i, '$1');
+
+    if (!fixedUrl.startsWith('http://') && !fixedUrl.startsWith('https://')) {
+        return null;
+    }
+    return fixedUrl;
+  }
+
   // Вспомогательные DOM-элементы объявляются один раз
   let actionsDiv, scheduleDiv, scheduleInput, setScheduleBtn, exportBtn, importBtn, autoRunSwitchDiv, autoRunAllSwitch, searchDiv, searchInput;
   let scenarioFilter = '';
@@ -375,11 +387,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const scenario = selectedArr[selectedIndex];
     if (!scenario.actions || !scenario.actions.length) return;
+    
+    const openUrl = getValidUrl(scenario.url);
+    if (!openUrl) {
+        alert('Invalid URL for scenario: ' + scenario.url);
+        return;
+    }
+
     if (!confirm(t('playActionsConfirm', { name: scenario.name }))) return;
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       const tab = tabs[0];
       // Проверяем, совпадает ли url активной вкладки с url сценария
-      if (tab && tab.url && tab.url.split('#')[0].split('?')[0] === scenario.url.split('#')[0].split('?')[0]) {
+      if (tab && tab.url && tab.url.split('#')[0].split('?')[0] === openUrl.split('#')[0].split('?')[0]) {
         // На нужной странице — проиграть сценарий и не закрывать вкладку
         sendMessageWithRetry(tab.id, {type: 'PLAY_ACTIONS', actions: scenario.actions}, (resp, err) => {
           if (err) {
@@ -390,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       } else {
         // Не на нужной странице — открыть новую вкладку, проиграть сценарий и закрыть
-        chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+        chrome.tabs.create({ url: openUrl, active: false }, newTab => {
           const listener = function(tabId, info) {
             if (tabId === newTab.id && info.status === 'complete') {
               setTimeout(() => {
@@ -494,14 +513,18 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.entries(scenarios).forEach(([url, arr]) => {
           if (!Array.isArray(arr)) return;
           arr.forEach((scenario, idx) => {
-            if (!scenario.url) return;
+            const openUrl = getValidUrl(scenario.url);
+            if (!openUrl) {
+                console.warn('[RunAll] Skipping invalid URL:', scenario.url);
+                return;
+            }
             total++;
-            chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+            chrome.tabs.create({ url: openUrl, active: false }, newTab => {
               const listener = function(tabId, info) {
                 if (tabId === newTab.id && info.status === 'complete') {
-                  console.log('[Website Auto Visitor] Tab loaded, waiting before sending PLAY_ACTIONS', tabId, scenario.url);
+                  console.log('[Website Auto Visitor] Tab loaded, waiting before sending PLAY_ACTIONS', tabId, openUrl);
                   setTimeout(() => {
-                    console.log('[Website Auto Visitor] Sending PLAY_ACTIONS to tab', tabId, scenario.url, scenario.actions);
+                    console.log('[Website Auto Visitor] Sending PLAY_ACTIONS to tab', tabId, openUrl, scenario.actions);
                     chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] }, (resp) => {
                       console.log('[Website Auto Visitor] PLAY_ACTIONS sendMessage callback', resp);
                     });

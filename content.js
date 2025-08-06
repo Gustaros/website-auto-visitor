@@ -6,6 +6,27 @@ console.log('[Website Auto Visitor] content.js loaded on', window.location.href)
 let isRecording = false;
 let recordedActions = [];
 
+// Функция для нормализации URL
+function normalizeUrl(url) {
+  // Проверяем валидные схемы для расширения
+  if (url === 'about:blank' || url.startsWith('chrome://') || url.startsWith('moz-extension://') || 
+      url.startsWith('chrome-extension://') || url.startsWith('file://')) {
+    return null; // Неподдерживаемый URL
+  }
+  
+  // Если URL уже имеет протокол, используем как есть
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+  
+  // Добавляем https:// только если это похоже на домен
+  if (/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*/.test(url)) {
+    return 'https://' + url.replace(/^\/*/, '');
+  }
+  
+  return null; // Некорректный URL
+}
+
 // Слушаем сообщения от popup/background
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'START_RECORDING') {
@@ -22,10 +43,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     chrome.storage.local.set({ recording: false });
     // Сохраняем сценарий всегда (как при хоткее)
     chrome.storage.local.get('scenarios', data => {
-      let url = window.location.href;
-      if (!/^https?:\/\//i.test(url)) {
-        url = 'https://' + url.replace(/^\/*/, '');
+      const rawUrl = window.location.href;
+      const url = normalizeUrl(rawUrl);
+      
+      // Если URL не поддерживается, не сохраняем сценарий
+      if (!url) {
+        sendResponse({status: 'error', message: 'Unsupported URL scheme'});
+        return;
       }
+      
       const domain = window.location.hostname;
       let scenarios = data.scenarios || {};
       const key = url || domain;
@@ -247,7 +273,15 @@ document.addEventListener('keydown', function(e) {
     chrome.storage.local.set({ recording: false });
     // Получаем все сценарии для подсчёта номера
     chrome.storage.local.get('scenarios', data => {
-      const url = window.location.href;
+      const rawUrl = window.location.href;
+      const url = normalizeUrl(rawUrl);
+      
+      // Если URL не поддерживается, не сохраняем сценарий
+      if (!url) {
+        alert('Cannot save scenario: Unsupported URL scheme');
+        return;
+      }
+      
       const domain = window.location.hostname;
       let scenarios = data.scenarios || {};
       const key = url || domain;
