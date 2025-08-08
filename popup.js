@@ -434,53 +434,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Экспорт/импорт сценариев ---
   exportBtn = document.getElementById('exportBtn');
-  if (!exportBtn) {
-    exportBtn = document.createElement('button');
-    exportBtn.id = 'exportBtn';
-    exportBtn.textContent = t('exportScenarios');
-    exportBtn.style.margin = '5px 0';
-    exportBtn.onclick = () => {
-      const data = JSON.stringify(scenarios, null, 2);
-      const blob = new Blob([data], {type: 'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'website-auto-visitor-scenarios.json';
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    };
-    document.body.appendChild(exportBtn);
-  }
+  exportBtn.onclick = () => {
+    const data = JSON.stringify(scenarios, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'website-auto-visitor-scenarios.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
   importBtn = document.getElementById('importBtn');
-  if (!importBtn) {
-    importBtn = document.createElement('button');
-    importBtn.id = 'importBtn';
-    importBtn.textContent = t('importScenarios');
-    importBtn.style.margin = '5px 0';
-    importBtn.onclick = () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.json,application/json';
-      input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          try {
-            const imported = JSON.parse(ev.target.result);
-            Object.assign(scenarios, imported);
-            chrome.storage.local.set({ scenarios }, () => updateScenarioList());
-            statusDiv.textContent = t('importSuccess');
-          } catch {
-            statusDiv.textContent = t('importError');
-          }
-        };
-        reader.readAsText(file);
+  importBtn.onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const imported = JSON.parse(ev.target.result);
+          Object.assign(scenarios, imported);
+          chrome.storage.local.set({ scenarios }, () => updateScenarioList());
+          statusDiv.textContent = t('importSuccess');
+        } catch {
+          statusDiv.textContent = t('importError');
+        }
       };
-      input.click();
+      reader.readAsText(file);
     };
-    document.body.appendChild(importBtn);
-  }
+    input.click();
+  };
 
   // --- Переключатель автозапуска всех сценариев при запуске браузера ---
   autoRunSwitchDiv = document.getElementById('autoRunSwitchDiv');
