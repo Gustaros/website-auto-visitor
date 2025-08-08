@@ -43,13 +43,20 @@ document.addEventListener('DOMContentLoaded', () => {
   function getValidUrl(url) {
     if (typeof url !== 'string') return null;
     let fixedUrl = url.trim();
-    // Replace repeated protocol prefixes like https://https://... with a single one.
-    fixedUrl = fixedUrl.replace(/^(https?:\/\/)+/i, '$1');
 
-    if (!fixedUrl.startsWith('http://') && !fixedUrl.startsWith('https://')) {
+    // Remove all occurrences of http:// or https://, then add a single https:// back.
+    // This handles https://https://, https//, http://https:// etc.
+    fixedUrl = fixedUrl.replace(/^(https?:\/\/)+/gi, '').replace(/^https?:\/\//gi, '');
+    fixedUrl = 'https://' + fixedUrl;
+
+    try {
+        // Use the URL constructor as a final validation check.
+        new URL(fixedUrl);
+        return fixedUrl;
+    } catch (e) {
+        console.warn('[getValidUrl] Invalid URL after fixing:', fixedUrl, e);
         return null;
     }
-    return fixedUrl;
   }
 
   // Вспомогательные DOM-элементы объявляются один раз
