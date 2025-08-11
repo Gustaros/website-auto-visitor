@@ -40,6 +40,25 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedIndex = -1;
   let scheduledTasks = {};
 
+  function getValidUrl(url) {
+    if (typeof url !== 'string') return null;
+    let fixedUrl = url.trim();
+
+    // Remove all occurrences of http:// or https://, then add a single https:// back.
+    // This handles https://https://, https//, http://https:// etc.
+    fixedUrl = fixedUrl.replace(/^(https?:\/\/)+/gi, '').replace(/^https?:\/\//gi, '');
+    fixedUrl = 'https://' + fixedUrl;
+
+    try {
+        // Use the URL constructor as a final validation check.
+        new URL(fixedUrl);
+        return fixedUrl;
+    } catch (e) {
+        console.warn('[getValidUrl] Invalid URL after fixing:', fixedUrl, e);
+        return null;
+    }
+  }
+
   // Вспомогательные DOM-элементы объявляются один раз
   let actionsDiv, scheduleDiv, scheduleInput, setScheduleBtn, exportBtn, importBtn, autoRunSwitchDiv, autoRunAllSwitch, searchDiv, searchInput;
   let scenarioFilter = '';
@@ -375,11 +394,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const scenario = selectedArr[selectedIndex];
     if (!scenario.actions || !scenario.actions.length) return;
+    
+    const openUrl = getValidUrl(scenario.url);
+    if (!openUrl) {
+        alert('Invalid URL for scenario: ' + scenario.url);
+        return;
+    }
+
     if (!confirm(t('playActionsConfirm', { name: scenario.name }))) return;
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       const tab = tabs[0];
       // Проверяем, совпадает ли url активной вкладки с url сценария
-      if (tab && tab.url && tab.url.split('#')[0].split('?')[0] === scenario.url.split('#')[0].split('?')[0]) {
+      if (tab && tab.url && tab.url.split('#')[0].split('?')[0] === openUrl.split('#')[0].split('?')[0]) {
         // На нужной странице — проиграть сценарий и не закрывать вкладку
         sendMessageWithRetry(tab.id, {type: 'PLAY_ACTIONS', actions: scenario.actions}, (resp, err) => {
           if (err) {
@@ -390,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       } else {
         // Не на нужной странице — открыть новую вкладку, проиграть сценарий и закрыть
-        chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+        chrome.tabs.create({ url: openUrl, active: false }, newTab => {
           const listener = function(tabId, info) {
             if (tabId === newTab.id && info.status === 'complete') {
               setTimeout(() => {
@@ -408,53 +434,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Экспорт/импорт сценариев ---
   exportBtn = document.getElementById('exportBtn');
-  if (!exportBtn) {
-    exportBtn = document.createElement('button');
-    exportBtn.id = 'exportBtn';
-    exportBtn.textContent = t('exportScenarios');
-    exportBtn.style.margin = '5px 0';
-    exportBtn.onclick = () => {
-      const data = JSON.stringify(scenarios, null, 2);
-      const blob = new Blob([data], {type: 'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'website-auto-visitor-scenarios.json';
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    };
-    document.body.appendChild(exportBtn);
-  }
+  exportBtn.onclick = () => {
+    const data = JSON.stringify(scenarios, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'website-auto-visitor-scenarios.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
   importBtn = document.getElementById('importBtn');
-  if (!importBtn) {
-    importBtn = document.createElement('button');
-    importBtn.id = 'importBtn';
-    importBtn.textContent = t('importScenarios');
-    importBtn.style.margin = '5px 0';
-    importBtn.onclick = () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.json,application/json';
-      input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          try {
-            const imported = JSON.parse(ev.target.result);
-            Object.assign(scenarios, imported);
-            chrome.storage.local.set({ scenarios }, () => updateScenarioList());
-            statusDiv.textContent = t('importSuccess');
-          } catch {
-            statusDiv.textContent = t('importError');
-          }
-        };
-        reader.readAsText(file);
+  importBtn.onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const imported = JSON.parse(ev.target.result);
+          Object.assign(scenarios, imported);
+          chrome.storage.local.set({ scenarios }, () => updateScenarioList());
+          statusDiv.textContent = t('importSuccess');
+        } catch {
+          statusDiv.textContent = t('importError');
+        }
       };
-      input.click();
+      reader.readAsText(file);
     };
-    document.body.appendChild(importBtn);
-  }
+    input.click();
+  };
 
   // --- Переключатель автозапуска всех сценариев при запуске браузера ---
   autoRunSwitchDiv = document.getElementById('autoRunSwitchDiv');
@@ -494,14 +507,18 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.entries(scenarios).forEach(([url, arr]) => {
           if (!Array.isArray(arr)) return;
           arr.forEach((scenario, idx) => {
-            if (!scenario.url) return;
+            const openUrl = getValidUrl(scenario.url);
+            if (!openUrl) {
+                console.warn('[RunAll] Skipping invalid URL:', scenario.url);
+                return;
+            }
             total++;
-            chrome.tabs.create({ url: scenario.url, active: false }, newTab => {
+            chrome.tabs.create({ url: openUrl, active: false }, newTab => {
               const listener = function(tabId, info) {
                 if (tabId === newTab.id && info.status === 'complete') {
-                  console.log('[Website Auto Visitor] Tab loaded, waiting before sending PLAY_ACTIONS', tabId, scenario.url);
+                  console.log('[Website Auto Visitor] Tab loaded, waiting before sending PLAY_ACTIONS', tabId, openUrl);
                   setTimeout(() => {
-                    console.log('[Website Auto Visitor] Sending PLAY_ACTIONS to tab', tabId, scenario.url, scenario.actions);
+                    console.log('[Website Auto Visitor] Sending PLAY_ACTIONS to tab', tabId, openUrl, scenario.actions);
                     chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] }, (resp) => {
                       console.log('[Website Auto Visitor] PLAY_ACTIONS sendMessage callback', resp);
                     });

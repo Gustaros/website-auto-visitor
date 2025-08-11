@@ -74,6 +74,25 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 // Заготовка для автоматизации по расписанию
 let scheduledTasks = {}
 
+function getValidUrl(url) {
+    if (typeof url !== 'string') return null;
+    let fixedUrl = url.trim();
+
+    // Remove all occurrences of http:// or https://, then add a single https:// back.
+    // This handles https://https://, https//, http://https:// etc.
+    fixedUrl = fixedUrl.replace(/^(https?:\/\/)+/gi, '').replace(/^https?:\/\//gi, '');
+    fixedUrl = 'https://' + fixedUrl;
+
+    try {
+        // Use the URL constructor as a final validation check.
+        new URL(fixedUrl);
+        return fixedUrl;
+    } catch (e) {
+        console.warn('[getValidUrl] Invalid URL after fixing:', fixedUrl, e);
+        return null;
+    }
+}
+
 // Псевдо-таймер для проверки расписания (каждую минуту)
 setInterval(() => {
   chrome.storage.local.get(['scenarios', 'scheduledTasks'], data => {
@@ -87,18 +106,25 @@ setInterval(() => {
       if (now.getHours() === h && now.getMinutes() === m) {
         const arr = scenarios[url] || [];
         const scenario = arr[idx];
-        if (!scenario) return;
+        if (!scenario || !scenario.url) return;
+        
+        const openUrl = getValidUrl(scenario.url);
+        if (!openUrl) {
+          console.warn('[Schedule] Skipping invalid URL:', scenario.url);
+          return;
+        }
+        
         // Проверяем, есть ли открытая вкладка с этим url
         chrome.tabs.query({}, tabs => {
           let found = false;
           tabs.forEach(tab => {
-            if (tab.url && tab.url.startsWith(url)) {
+            if (tab.url && tab.url.startsWith(openUrl)) {
               found = true;
               chrome.tabs.sendMessage(tab.id, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
             }
           });
           if (!found) {
-            chrome.tabs.create({ url: url }, newTab => {
+            chrome.tabs.create({ url: openUrl }, newTab => {
               chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
                 if (tabId === newTab.id && info.status === 'complete') {
                   chrome.tabs.sendMessage(tabId, { type: 'PLAY_ACTIONS', actions: scenario.actions || [] });
@@ -131,8 +157,13 @@ chrome.runtime.onStartup.addListener(() => {
       if (!Array.isArray(arr)) return;
       arr.forEach((scenario, idx) => {
         if (!scenario.url) return;
-        // Используем url как есть
-        const openUrl = scenario.url;
+        
+        const openUrl = getValidUrl(scenario.url);
+        if (!openUrl) {
+          console.warn('[AutoRun] Skipping invalid URL:', scenario.url);
+          return;
+        }
+        
         console.log('[AutoRun] Открываю url:', openUrl);
         chrome.tabs.create({ url: openUrl, active: false }, newTab => {
           const listener = function(tabId, info) {
