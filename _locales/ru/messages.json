@@ -165,7 +165,7 @@
     "message": "текущий"
   },
   "selectScenarioStatus": {
-    "message": "Выбрано: {name} ({domain}). {count, plural, one{# действие} few{# действия} many{# действий} other{# действий}}."
+    "message": "{name}"
   },
   "playActionsConfirm": {
     "message": "Воспроизвести: {name}?"

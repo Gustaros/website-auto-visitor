@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recordedActions = scenario.actions || [];
         playBtn.disabled = !recordedActions.length;
         updateScenarioList();
-        statusDiv.textContent = t('selectScenarioStatus', { name: scenario.name, domain: scenario.domain, count: recordedActions.length });
+        statusDiv.textContent = t('selectScenarioStatus', { name: scenario.name });
         renderActionsList();
         const descDiv = document.getElementById('descDiv');
         const descTextarea = document.getElementById('scenario-desc');
