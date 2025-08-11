@@ -71,5 +71,6 @@
   },
   "runAllScenarios": { "message": "Alle Szenarien ausführen" },
   "runAllStarted": { "message": "Alle Szenarien wurden gestartet." },
-  "currentSite": { "message": "Aktuelle Seite:" }
+  "currentSite": { "message": "Aktuelle Seite:" },
+  "deleteScenarioConfirm": { "message": "Are you sure you want to delete the scenario \"{name}\"? This action cannot be undone." }
 }

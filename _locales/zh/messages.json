@@ -71,5 +71,6 @@
   },
   "runAllScenarios": { "message": "运行所有场景" },
   "runAllStarted": { "message": "所有场景已启动。" },
-  "currentSite": { "message": "当前网站：" }
+  "currentSite": { "message": "当前网站：" },
+  "deleteScenarioConfirm": { "message": "Are you sure you want to delete the scenario \"{name}\"? This action cannot be undone." }
 }

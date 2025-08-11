@@ -336,15 +336,17 @@ document.addEventListener('DOMContentLoaded', () => {
       delBtn.title = t('deleteScenario', { name });
       delBtn.onclick = (e) => {
         e.stopPropagation();
-        arr.splice(idx, 1);
-        chrome.storage.local.set({ scenarios }, () => {
-          // Если удалили выбранный — сбросить выбор
-          if (arr === selectedArr && idx === selectedIndex) {
-            selectedArr = null;
-            selectedIndex = -1;
-          }
-          updateScenarioList();
-        });
+        if (confirm(t('deleteScenarioConfirm', { name }))) {
+          arr.splice(idx, 1);
+          chrome.storage.local.set({ scenarios }, () => {
+            // Если удалили выбранный — сбросить выбор
+            if (arr === selectedArr && idx === selectedIndex) {
+              selectedArr = null;
+              selectedIndex = -1;
+            }
+            updateScenarioList();
+          });
+        }
       };
       
       // --- Индивидуальное расписание ---
