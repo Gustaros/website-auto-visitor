@@ -165,7 +165,7 @@
     "message": "текущий"
   },
   "selectScenarioStatus": {
-    "message": "Выбрано: {name} ({domain}). {count, plural, one{# действие} few{# действия} many{# действий} other{# действий}}."
+    "message": "{name}"
   },
   "playActionsConfirm": {
     "message": "Воспроизвести: {name}?"
@@ -193,5 +193,8 @@
   },
   "runAllStarted": {
     "message": "Запущены все сценарии."
+  },
+  "deleteScenarioConfirm": {
+    "message": "Вы уверены, что хотите удалить сценарий «{name}»? Это действие нельзя отменить."
   }
 }

@@ -57,7 +57,7 @@
   "errorHttpOnly": { "message": "Die Erweiterung funktioniert nur auf regulären Seiten (http/https)." },
   "errorDomainDetect": { "message": "Domain konnte nicht ermittelt werden." },
   "current": { "message": "aktuell" },
-  "selectScenarioStatus": { "message": "Ausgewählt: {name} ({domain}). {count, plural, one{1 Aktion} other{{count} Aktionen}}." },
+  "selectScenarioStatus": { "message": "{name}" },
   "playActionsConfirm": { "message": "Aktionen abspielen: {name}?" },
   "clearAllScenarios": { "message": "Alle Szenarien löschen" },
   "clearAllConfirm": { "message": "Möchten Sie wirklich alle Szenarien löschen? Dies kann nicht rückgängig gemacht werden." },
@@ -71,5 +71,6 @@
   },
   "runAllScenarios": { "message": "Alle Szenarien ausführen" },
   "runAllStarted": { "message": "Alle Szenarien wurden gestartet." },
-  "currentSite": { "message": "Aktuelle Seite:" }
+  "currentSite": { "message": "Aktuelle Seite:" },
+  "deleteScenarioConfirm": { "message": "Are you sure you want to delete the scenario \"{name}\"? This action cannot be undone." }
 }

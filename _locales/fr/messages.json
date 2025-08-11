@@ -53,7 +53,7 @@
   "errorHttpOnly": { "message": "L'extension fonctionne uniquement sur les sites classiques (http/https)." },
   "errorDomainDetect": { "message": "Impossible de déterminer le domaine." },
   "current": { "message": "actuel" },
-  "selectScenarioStatus": { "message": "Sélectionné : {name} ({domain}). {count, plural, one{1 action} other{{count} actions}}." },
+  "selectScenarioStatus": { "message": "{name}" },
   "playActionsConfirm": { "message": "Lire les actions : {name} ?" },
   "clearAllScenarios": { "message": "Supprimer tous les scénarios" },
   "clearAllConfirm": { "message": "Êtes-vous sûr de vouloir supprimer tous les scénarios ? Cette action est irréversible." },
@@ -67,5 +67,6 @@
   },
   "runAllScenarios": { "message": "Exécuter tous les scénarios" },
   "runAllStarted": { "message": "Tous les scénarios ont été lancés." },
-  "currentSite": { "message": "Site actuel :" }
+  "currentSite": { "message": "Site actuel :" },
+  "deleteScenarioConfirm": { "message": "Are you sure you want to delete the scenario \"{name}\"? This action cannot be undone." }
 }

@@ -57,7 +57,7 @@
   "errorHttpOnly": { "message": "La extensión solo funciona en sitios normales (http/https)." },
   "errorDomainDetect": { "message": "No se pudo determinar el dominio." },
   "current": { "message": "actual" },
-  "selectScenarioStatus": { "message": "Seleccionado: {name} ({domain}). {count, plural, one{1 acción} other{{count} acciones}}." },
+  "selectScenarioStatus": { "message": "{name}" },
   "playActionsConfirm": { "message": "Reproducir acciones: {name}?" },
   "clearAllScenarios": { "message": "Eliminar todos los escenarios" },
   "clearAllConfirm": { "message": "¿Está seguro de que desea eliminar todos los escenarios? Esto no se puede deshacer." },
@@ -71,5 +71,6 @@
   },
   "runAllScenarios": { "message": "Ejecutar todos los escenarios" },
   "runAllStarted": { "message": "Todos los escenarios han sido iniciados." },
-  "currentSite": { "message": "Sitio actual:" }
+  "currentSite": { "message": "Sitio actual:" },
+  "deleteScenarioConfirm": { "message": "Are you sure you want to delete the scenario \"{name}\"? This action cannot be undone." }
 }
