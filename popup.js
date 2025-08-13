@@ -237,10 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
       li.dataset.key = originalKey;
       li.dataset.index = originalIndex;
       
-      const nameSpan = document.createElement('span');
-      nameSpan.className = 'scenario-name';
-      nameSpan.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
-      nameSpan.onclick = () => {
+      li.onclick = () => {
         selectedArr = originalArray;
         selectedIndex = originalIndex;
         recordedActions = scenario.actions || [];
@@ -253,8 +250,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (descDiv && scenario.desc) {
           descDiv.style.display = 'block';
           if (descTextarea) descTextarea.value = scenario.desc;
+        } else if (descDiv) {
+          descDiv.style.display = 'none';
         }
       };
+      
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'scenario-name';
+      nameSpan.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
       li.appendChild(nameSpan);
 
       if (originalArray === selectedArr && originalIndex === selectedIndex) {
