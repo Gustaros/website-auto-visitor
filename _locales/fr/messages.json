@@ -68,5 +68,7 @@
   "runAllScenarios": { "message": "Exécuter tous les scénarios" },
   "runAllStarted": { "message": "Tous les scénarios ont été lancés." },
   "currentSite": { "message": "Site actuel :" },
-  "deleteScenarioConfirm": { "message": "Are you sure you want to delete the scenario \"{name}\"? This action cannot be undone." }
+  "deleteScenarioConfirm": { "message": "Are you sure you want to delete the scenario \"{name}\"? This action cannot be undone." },
+  "allScenariosView": { "message": "Tous les scénarios" }
+}
 }

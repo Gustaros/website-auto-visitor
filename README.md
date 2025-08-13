@@ -6,7 +6,7 @@ A browser extension for automating daily check-ins, bonus collection, and routin
 - **Record and replay actions:** Easily record clicks, text input, and navigation on any website using the extension popup, then replay them with one click.
 - **Scenario management:** Save, rename, describe, and organize multiple scenarios per website. Quickly switch between them.
 - **Advanced section:** Export, import, or delete all scenarios in one place. The Advanced section is collapsible and fully localized.
-- **Scheduling (coming soon):** Set up daily or timed automation for your scenarios (feature in roadmap).
+- **Scheduling:** Set up daily or timed automation for your scenarios.
 - **Auto-run:** Optionally run all scenarios automatically on browser startup.
 - **Cross-browser:** Works in Chrome, Edge, and Firefox.
 - **Full localization:** All UI elements, tooltips, and section titles are available in English, Russian, German, French, Spanish, and Chinese.
@@ -31,13 +31,9 @@ A browser extension for automating daily check-ins, bonus collection, and routin
 
 ## Limitations
 - Does not work on browser-internal pages (chrome://, about:blank, etc.)
-- Scheduled automation is not yet available (see roadmap)
-- Only clicks and text input are supported (scrolling and navigation coming soon)
 - No cloud sync: all data is stored locally in your browser
 
 ## Roadmap
-- Add support for scrolling and link navigation
-- Scheduled and recurring automation
 - Improved scenario editor and visualizer
 - Cloud sync and backup
 - More onboarding and help features

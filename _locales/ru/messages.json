@@ -196,5 +196,8 @@
   },
   "deleteScenarioConfirm": {
     "message": "Вы уверены, что хотите удалить сценарий «{name}»? Это действие нельзя отменить."
+  },
+  "allScenariosView": {
+    "message": "Все сценарии"
   }
 }
