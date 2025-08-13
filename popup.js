@@ -205,35 +205,44 @@ document.addEventListener('DOMContentLoaded', () => {
     updateScenarioList();
   });
 
+  let draggedItem = null;
+  let draggedItemData = {};
+
   function updateScenarioList() {
     if (!scenarioList) return;
+    const scrollTop = scenarioList.scrollTop;
     scenarioList.innerHTML = '';
     let allScenarios = [];
+    
+    // Собираем все сценарии в один плоский массив для удобства
     Object.entries(scenarios).forEach(([key, arr]) => {
       if (Array.isArray(arr)) {
         arr.forEach((scenario, idx) => {
           if (!scenarioFilter || scenario.name.toLowerCase().includes(scenarioFilter)) {
-            allScenarios.push({ scenario, idx, arr, key });
+            allScenarios.push({ scenario, originalIndex: idx, originalArray: arr, originalKey: key });
           }
         });
       }
     });
 
     if (allScenarios.length === 0) {
-      scenarioList.innerHTML = ''; // Clear previous content
+      scenarioList.innerHTML = '<li class="empty-list-message">' + t('noScenariosFound') + '</li>';
       return;
     }
 
-    allScenarios.forEach(({ scenario, idx, arr, key }) => {
+    allScenarios.forEach(({ scenario, originalIndex, originalArray, originalKey }, displayIndex) => {
       const name = scenario.name || (scenario.domain + scenario.url);
       const li = document.createElement('li');
+      li.draggable = true;
+      li.dataset.key = originalKey;
+      li.dataset.index = originalIndex;
       
       const nameSpan = document.createElement('span');
       nameSpan.className = 'scenario-name';
       nameSpan.textContent = name + (scenario.url === currentUrl ? ' (' + t('current') + ')' : '');
       nameSpan.onclick = () => {
-        selectedArr = arr;
-        selectedIndex = idx;
+        selectedArr = originalArray;
+        selectedIndex = originalIndex;
         recordedActions = scenario.actions || [];
         playBtn.disabled = !recordedActions.length;
         updateScenarioList();
@@ -248,14 +257,13 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       li.appendChild(nameSpan);
 
-      if (arr === selectedArr && idx === selectedIndex) {
+      if (originalArray === selectedArr && originalIndex === selectedIndex) {
         li.classList.add('selected');
       }
 
       const controlsDiv = document.createElement('div');
       controlsDiv.className = 'scenario-controls';
       
-      // Кнопка переименования
       const renameBtn = document.createElement('button');
       renameBtn.className = 'btn-sm btn-edit';
       renameBtn.appendChild(createIcon('edit'));
@@ -269,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
           buttons: [
             { text: t('onboardingOk'), class: 'btn-primary', onClick: (newName) => {
               if (newName && newName !== scenario.name) {
-                chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: scenario.domain, name: newName, url: scenario.url, index: idx }, () => {
+                chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: scenario.domain, name: newName, url: scenario.url, index: originalIndex }, () => {
                   scenario.name = newName;
                   updateScenarioList();
                 });
@@ -280,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       };
 
-      // Кнопка/иконка для редактирования описания
       const descBtn = document.createElement('button');
       descBtn.className = 'btn-sm btn-desc';
       descBtn.appendChild(createIcon('description'));
@@ -294,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
           buttons: [
             { text: t('onboardingOk'), class: 'btn-primary', onClick: (newDesc) => {
               if (newDesc !== scenario.desc) {
-                chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: scenario.domain, name: scenario.name, desc: newDesc, url: scenario.url, index: idx }, () => {
+                chrome.runtime.sendMessage({ type: 'RENAME_SCENARIO', domain: scenario.domain, name: scenario.name, desc: newDesc, url: scenario.url, index: originalIndex }, () => {
                   scenario.desc = newDesc;
                   updateScenarioList();
                 });
@@ -305,7 +312,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       };
       
-      // Кнопка удаления
       const delBtn = document.createElement('button');
       delBtn.className = 'btn-sm btn-delete';
       delBtn.appendChild(createIcon('delete'));
@@ -317,9 +323,9 @@ document.addEventListener('DOMContentLoaded', () => {
           message: t('deleteScenarioConfirm', { name }),
           buttons: [
             { text: t('deleteAction'), class: 'btn-danger', onClick: () => {
-              arr.splice(idx, 1);
+              originalArray.splice(originalIndex, 1);
               chrome.storage.local.set({ scenarios }, () => {
-                if (arr === selectedArr && idx === selectedIndex) {
+                if (originalArray === selectedArr && originalIndex === selectedIndex) {
                   selectedArr = null;
                   selectedIndex = -1;
                 }
@@ -331,7 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       };
 
-      // --- Индивидуальное расписание ---
       const scheduleWrap = document.createElement('span');
       scheduleWrap.style.marginLeft = '4px';
       const timeInput = document.createElement('input');
@@ -339,8 +344,8 @@ document.addEventListener('DOMContentLoaded', () => {
       timeInput.style.width = '60px';
       timeInput.style.fontSize = '10px';
       timeInput.style.height = '20px';
-      timeInput.onclick = () => { if (timeInput.showPicker) timeInput.showPicker(); };
-      const schedKey = scenario.url + '__' + idx;
+      timeInput.onclick = (e) => { e.stopPropagation(); if (timeInput.showPicker) timeInput.showPicker(); };
+      const schedKey = scenario.url + '__' + originalIndex;
       timeInput.value = scheduledTasks[schedKey] || '';
       timeInput.title = t('autoRunSchedule');
       const setBtn = document.createElement('button');
@@ -352,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
       setBtn.onclick = (e) => {
         e.stopPropagation();
         if (!timeInput.value) return;
-        chrome.runtime.sendMessage({ type: 'SCHEDULE_SCENARIO', url: scenario.url, index: idx, time: timeInput.value }, resp => {
+        chrome.runtime.sendMessage({ type: 'SCHEDULE_SCENARIO', url: scenario.url, index: originalIndex, time: timeInput.value }, resp => {
           scheduledTasks[schedKey] = timeInput.value;
           statusDiv.textContent = t('scheduleSet', { domain: name, time: timeInput.value });
         });
@@ -366,9 +371,81 @@ document.addEventListener('DOMContentLoaded', () => {
       controlsDiv.appendChild(delBtn);
       li.appendChild(controlsDiv);
       scenarioList.appendChild(li);
+
+      // --- Drag and Drop Event Listeners ---
+      li.addEventListener('dragstart', (e) => {
+        draggedItem = li;
+        draggedItemData = { key: originalKey, index: originalIndex };
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => li.classList.add('dragging'), 0);
+      });
+
+      li.addEventListener('dragend', () => {
+        li.classList.remove('dragging');
+        draggedItem = null;
+      });
     });
+
     renderActionsList();
+    scenarioList.scrollTop = scrollTop;
   }
+
+  // --- Drag and Drop Handlers for the list ---
+  scenarioList.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    const target = e.target.closest('li');
+    if (target && target !== draggedItem) {
+      // Remove from others
+      Array.from(scenarioList.children).forEach(child => child.classList.remove('drag-over'));
+      target.classList.add('drag-over');
+    }
+  });
+
+  scenarioList.addEventListener('dragleave', (e) => {
+    const target = e.target.closest('li');
+    if (target) {
+      target.classList.remove('drag-over');
+    }
+  });
+
+  scenarioList.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const target = e.target.closest('li');
+    if (!target || target === draggedItem) {
+      Array.from(scenarioList.children).forEach(child => child.classList.remove('drag-over'));
+      return;
+    }
+
+    const fromKey = draggedItemData.key;
+    const fromIndex = draggedItemData.index;
+    const toKey = target.dataset.key;
+    const toIndex = parseInt(target.dataset.index, 10);
+
+    // Remove styling
+    target.classList.remove('drag-over');
+
+    // Perform the reorder
+    const itemToMove = scenarios[fromKey].splice(fromIndex, 1)[0];
+    scenarios[toKey].splice(toIndex, 0, itemToMove);
+
+    // If an item was selected, update its index
+    if (selectedArr && selectedIndex !== -1) {
+        const selectedScenario = selectedArr[selectedIndex];
+        // Find the new position of the selected scenario
+        Object.values(scenarios).forEach(arr => {
+            const newIndex = arr.findIndex(s => s === selectedScenario);
+            if (newIndex !== -1) {
+                selectedArr = arr;
+                selectedIndex = newIndex;
+            }
+        });
+    }
+
+    // Save and re-render
+    chrome.storage.local.set({ scenarios }, () => {
+      updateScenarioList();
+    });
+  });
 
   if (playBtn) playBtn.onclick = () => {
     if (!selectedArr || selectedIndex === -1 || !selectedArr[selectedIndex]) {
