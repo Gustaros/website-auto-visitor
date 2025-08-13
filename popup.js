@@ -115,49 +115,60 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-    const tabId = tabs[0]?.id;
-    if (!tabId) return;
-    chrome.tabs.sendMessage(tabId, { type: 'GET_RECORDING_STATUS' }, resp => {
-      if (resp && resp.recording) {
+    const tab = tabs[0];
+    if (!tab) return;
+
+    const url = tab.url || '';
+    const isWebPage = url.startsWith('http');
+
+    const initializeUI = (isRecording = false) => {
+      if (isRecording) {
         statusDiv.textContent = t('statusRecording');
         startBtn.disabled = true;
         stopBtn.disabled = false;
         playBtn.disabled = true;
         showHotkeyHint();
-        chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
-          scenarios = resp.scenarios || {};
-          updateScenarioList();
+      } else {
+        if (isWebPage) {
+          try {
+            const parsed = new URL(url);
+            currentDomain = parsed.hostname;
+            currentUrl = url;
+            statusDiv.textContent = t('currentSite') + ' ' + currentDomain;
+            statusDiv.className = 'header-status success';
+            startBtn.disabled = false;
+          } catch (e) {
+            // Fallback for safety
+            statusDiv.textContent = t('allScenariosView');
+            statusDiv.className = 'header-status';
+            startBtn.disabled = true;
+          }
+        } else {
+          currentUrl = '';
+          currentDomain = '';
+          statusDiv.textContent = t('allScenariosView');
+          statusDiv.className = 'header-status';
+          startBtn.disabled = true;
+        }
+        stopBtn.disabled = true;
+        playBtn.disabled = true;
+      }
+      updateScenarioList();
+    };
+
+    // Загружаем сценарии в любом случае
+    chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
+      scenarios = resp.scenarios || {};
+
+      if (isWebPage) {
+        // Если это веб-страница, проверяем статус записи
+        sendMessageWithRetry(tab.id, { type: 'GET_RECORDING_STATUS' }, (resp, err) => {
+          const isRecording = !err && resp && resp.recording;
+          initializeUI(isRecording);
         });
       } else {
-        let url = '';
-        try {
-          url = tabs[0].url || '';
-          if (!url.startsWith('http')) {
-            statusDiv.textContent = t('errorHttpOnly');
-            statusDiv.className = 'header-status error';
-            startBtn.disabled = true;
-            stopBtn.disabled = true;
-            playBtn.disabled = true;
-            return;
-          }
-          const parsed = new URL(url);
-          currentDomain = parsed.hostname;
-          currentUrl = url;
-          statusDiv.textContent = t('currentSite') + ' ' + currentDomain;
-          statusDiv.className = 'header-status success';
-        } catch {
-          statusDiv.textContent = t('errorDomainDetect');
-          statusDiv.className = 'header-status error';
-          startBtn.disabled = true;
-          stopBtn.disabled = true;
-          playBtn.disabled = true;
-          return;
-        }
-        chrome.runtime.sendMessage({type: 'GET_SCENARIOS'}, resp => {
-          scenarios = resp.scenarios || {};
-          updateScenarioList();
-        });
-        stopBtn.disabled = true;
+        // Если это внутренняя страница, просто инициализируем UI
+        initializeUI(false);
       }
     });
   });

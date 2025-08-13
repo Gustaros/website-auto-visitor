@@ -196,5 +196,8 @@
   },
   "deleteScenarioConfirm": {
     "message": "Are you sure you want to delete the scenario \"{name}\"? This action cannot be undone."
+  },
+  "allScenariosView": {
+    "message": "All scenarios"
   }
 }
